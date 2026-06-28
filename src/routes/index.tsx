@@ -5,6 +5,8 @@ import { HERO_IMAGE_AR, HERO_IMAGE_EN } from '~/lib/hero-images';
 type Locale = 'ar' | 'en';
 type ThemeMode = 'dark' | 'light';
 
+const HERO_ASSET_VERSION = 'hero-v20260628-05';
+
 export default component$(() => {
   const locale = useSignal<Locale>('en');
   const theme = useSignal<ThemeMode>('dark');
@@ -100,6 +102,7 @@ export default component$(() => {
     <>
       <section
         id="about"
+        data-hero-version={HERO_ASSET_VERSION}
         class={`relative min-h-[700px] lg:min-h-[780px] overflow-hidden flex items-center ${isAr() ? 'font-arabic' : ''}`}
       >
         <img
@@ -114,16 +117,16 @@ export default component$(() => {
           class="absolute inset-0 pointer-events-none"
           style={{
             background: isAr()
-              ? 'linear-gradient(90deg, rgba(15,23,42,0.98) 0%, rgba(15,23,42,0.90) 30%, rgba(15,23,42,0.42) 58%, rgba(15,23,42,0.08) 100%)'
-              : 'linear-gradient(90deg, rgba(15,23,42,0.08) 0%, rgba(15,23,42,0.42) 42%, rgba(15,23,42,0.90) 70%, rgba(15,23,42,0.98) 100%)',
+              ? 'linear-gradient(90deg, rgba(15,23,42,0.98) 0%, rgba(15,23,42,0.92) 32%, rgba(15,23,42,0.50) 58%, rgba(15,23,42,0.12) 100%)'
+              : 'linear-gradient(90deg, rgba(15,23,42,0.12) 0%, rgba(15,23,42,0.50) 42%, rgba(15,23,42,0.92) 70%, rgba(15,23,42,0.98) 100%)',
           }}
         />
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_76%_35%,rgba(6,182,212,0.14),transparent_28%),radial-gradient(circle_at_88%_78%,rgba(29,78,216,0.14),transparent_26%)] pointer-events-none"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_76%_35%,rgba(6,182,212,0.12),transparent_28%),radial-gradient(circle_at_88%_78%,rgba(29,78,216,0.12),transparent_26%)] pointer-events-none"></div>
         <div class="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#0f172a] to-transparent pointer-events-none"></div>
 
-        <div class="relative z-10 w-full px-6 lg:px-12 py-24 lg:py-32">
+        <div class="relative z-10 w-full px-6 lg:px-12 py-24 lg:py-32" dir="ltr">
           <div class={`max-w-6xl mx-auto w-full flex ${isAr() ? 'justify-start' : 'justify-end'}`}>
-            <div class={`w-full max-w-xl ${isAr() ? 'text-right' : 'text-left'}`}>
+            <div dir={isAr() ? 'rtl' : 'ltr'} class={`w-full max-w-[34rem] ${isAr() ? 'text-right' : 'text-left'}`}>
               <p class="text-sm font-semibold uppercase tracking-widest mb-4 text-cyan-400">
                 {isAr() ? 'مرحباً، أنا' : "Hi, I'm"}
               </p>
@@ -167,7 +170,6 @@ export default component$(() => {
             <h2 class="text-3xl md:text-4xl font-bold mb-3">{isAr() ? 'الخدمات' : 'Services'}</h2>
             <p class={`text-base ${isDark() ? 'text-slate-400' : 'text-slate-600'}`}>{isAr() ? 'ما أقدمه لك' : 'What I Offer'}</p>
           </div>
-
           <div class="grid md:grid-cols-3 gap-6">
             {services.map((service) => (
               <div key={service.titleEn} class={`p-7 rounded-2xl border transition-all hover:scale-[1.02] ${isDark() ? 'bg-slate-800/50 border-slate-700 hover:border-cyan-500/50' : 'bg-white border-slate-200 hover:border-cyan-500/50 shadow-sm'}`}>
@@ -186,7 +188,6 @@ export default component$(() => {
             <h2 class="text-3xl md:text-4xl font-bold mb-3">{isAr() ? 'المهارات التقنية' : 'Technical Skills'}</h2>
             <p class={`text-base ${isDark() ? 'text-slate-400' : 'text-slate-600'}`}>{isAr() ? 'التقنيات التي أعمل بها' : 'Technologies I Work With'}</p>
           </div>
-
           <div class="grid md:grid-cols-2 gap-5">
             {skills.map((skill) => (
               <div key={skill.name} class="group">
@@ -209,7 +210,6 @@ export default component$(() => {
             <h2 class="text-3xl md:text-4xl font-bold mb-3">{isAr() ? 'تواصل معي' : 'Get in Touch'}</h2>
             <p class={`text-base ${isDark() ? 'text-slate-400' : 'text-slate-600'}`}>{isAr() ? 'أرسل لي رسالة وسأرد عليك في أقرب وقت' : "Send me a message and I'll get back to you soon"}</p>
           </div>
-
           <form preventdefault:submit onSubmit$={handleContact} class="space-y-5">
             <div class="grid md:grid-cols-2 gap-5">
               <div>
@@ -229,15 +229,12 @@ export default component$(() => {
               <label class="block text-sm font-medium mb-2">{isAr() ? 'الرسالة' : 'Message'}</label>
               <textarea name="message" required rows={5} class={`w-full px-4 py-3 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none ${isDark() ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'}`} placeholder={isAr() ? 'اكتب رسالتك هنا...' : 'Write your message here...'}></textarea>
             </div>
-
             {contactStatus.value === 'success' && <div class="p-4 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-sm text-center">{isAr() ? 'تم إرسال رسالتك بنجاح! سأرد عليك قريباً.' : "Your message has been sent successfully! I'll get back to you soon."}</div>}
             {contactStatus.value === 'error' && <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm text-center">{isAr() ? 'حدث خطأ، يرجى المحاولة مرة أخرى.' : 'An error occurred, please try again.'}</div>}
-
             <button type="submit" disabled={contactStatus.value === 'sending'} class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3.5 rounded-xl font-bold hover:opacity-90 transition-all shadow-lg shadow-cyan-500/20 disabled:opacity-50">
               {contactStatus.value === 'sending' ? (isAr() ? 'جاري الإرسال...' : 'Sending...') : (isAr() ? 'إرسال الرسالة' : 'Send Message')}
             </button>
           </form>
-
           <div class="mt-12 grid md:grid-cols-3 gap-4 text-center">
             <div class={`p-4 rounded-xl ${isDark() ? 'bg-slate-800/50' : 'bg-white shadow-sm'}`}>
               <p class="text-sm font-semibold mb-1">{isAr() ? 'البريد' : 'Email'}</p>
