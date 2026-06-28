@@ -1,0 +1,4 @@
+/admin/login /admin/login/index.html 200
+/admin/setup /admin/setup/index.html 200
+/admin /admin/index.html 200
+/ /index.html 200
