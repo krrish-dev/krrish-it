@@ -218,6 +218,7 @@ async function login(req: Request): Promise<Response> {
     200,
     {
       success: true,
+      token,
       user: {
         id: user._id.toString(),
         email: user.email,
