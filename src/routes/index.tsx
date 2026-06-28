@@ -1,5 +1,6 @@
 import { component$, useSignal, useVisibleTask$, $ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
+import { HERO_IMAGE_AR, HERO_IMAGE_EN } from '~/lib/hero-images';
 
 type Locale = 'ar' | 'en';
 type ThemeMode = 'dark' | 'light';
@@ -58,6 +59,7 @@ export default component$(() => {
 
   const isDark = () => theme.value === 'dark';
   const isAr = () => locale.value === 'ar';
+  const heroImage = () => (isAr() ? HERO_IMAGE_AR : HERO_IMAGE_EN);
 
   const skills = [
     { name: 'Node.js', level: 90 },
@@ -96,16 +98,25 @@ export default component$(() => {
 
   return (
     <>
-      <section id="about" class="relative px-6 lg:px-12 py-20 lg:py-32 overflow-hidden">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-cyan-500/8 blur-[120px] rounded-full -z-10"></div>
-        <div class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-blue-500/5 blur-[100px] rounded-full -z-10"></div>
+      <section
+        id="about"
+        class={`relative min-h-[680px] px-6 lg:px-12 py-24 lg:py-32 overflow-hidden flex items-center ${isAr() ? 'font-arabic' : ''}`}
+        style={{
+          backgroundImage: `linear-gradient(90deg, rgba(15,23,42,0.08) 0%, rgba(15,23,42,0.20) 34%, rgba(15,23,42,0.82) 58%, rgba(15,23,42,0.98) 100%), url("${heroImage()}")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_78%_35%,rgba(6,182,212,0.18),transparent_30%),radial-gradient(circle_at_92%_72%,rgba(29,78,216,0.18),transparent_26%)] pointer-events-none"></div>
+        <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0f172a] to-transparent pointer-events-none"></div>
 
-        <div class={`max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12 ${isAr() ? 'font-arabic' : ''}`}>
-          <div class={`flex-1 ${isAr() ? 'text-center lg:text-right' : 'text-center lg:text-left'}`}>
+        <div class="relative z-10 max-w-6xl mx-auto w-full flex justify-end">
+          <div class={`w-full max-w-xl ${isAr() ? 'text-right' : 'text-left'}`}>
             <p class="text-sm font-semibold uppercase tracking-widest mb-4 text-cyan-400">
               {isAr() ? 'مرحباً، أنا' : "Hi, I'm"}
             </p>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 leading-tight">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 leading-tight drop-shadow-xl">
               {isAr() ? (
                 <>
                   <span class="text-[#e63946]">كيرلس</span>{' '}
@@ -118,32 +129,21 @@ export default component$(() => {
                 </>
               )}
             </h1>
-            <h2 class={`text-xl md:text-2xl font-semibold mb-6 ${isDark() ? 'text-slate-300' : 'text-slate-700'}`}>
+            <h2 class="text-xl md:text-2xl font-semibold mb-6 text-slate-200 drop-shadow">
               {isAr() ? 'مهندس برمجيات ومدير سيرفرات' : 'Software Engineer & Server Admin'}
             </h2>
-            <p class={`text-base md:text-lg leading-relaxed max-w-2xl mb-8 ${isDark() ? 'text-slate-400' : 'text-slate-600'} ${isAr() ? 'mx-auto lg:mr-0 lg:ml-auto' : 'mx-auto lg:ml-0'}`}>
+            <p class="text-base md:text-lg leading-relaxed mb-8 text-slate-300 drop-shadow max-w-xl">
               {isAr()
                 ? 'مهندس برمجيات بخبرة تقارب 10 سنوات في تطوير البرمجيات وإدارة السيرفرات. أقدم حلول ويب متكاملة تشمل مواقع الشركات، المتاجر الإلكترونية، أنظمة الإدارة، ربط قواعد البيانات، وتأمين ونشر التطبيقات على السيرفرات.'
                 : 'Software Engineer with ~10 years working across servers and software. Delivers end-to-end projects including company websites, e-commerce stores, admin systems, database integrations, and secure production deployments.'}
             </p>
-            <div class={`flex flex-col sm:flex-row gap-4 ${isAr() ? 'justify-center lg:justify-end' : 'justify-center lg:justify-start'}`}>
+            <div class={`flex flex-col sm:flex-row gap-4 ${isAr() ? 'justify-end' : 'justify-start'}`}>
               <a href="#contact" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-8 py-3.5 rounded-xl font-bold hover:opacity-90 transition-all text-center shadow-lg shadow-cyan-500/20">
                 {isAr() ? 'تواصل معي' : 'Get in Touch'}
               </a>
-              <a href="#services" class={`px-8 py-3.5 rounded-xl font-bold transition-all text-center border ${isDark() ? 'border-slate-700 hover:border-cyan-500 hover:bg-slate-800' : 'border-slate-300 hover:border-cyan-500 hover:bg-slate-50'}`}>
+              <a href="#services" class="px-8 py-3.5 rounded-xl font-bold transition-all text-center border border-slate-600 hover:border-cyan-500 hover:bg-slate-800/80 bg-slate-950/20 backdrop-blur-sm">
                 {isAr() ? 'اعرف المزيد' : 'Learn More'}
               </a>
-            </div>
-          </div>
-
-          <div class="flex-shrink-0">
-            <div class={`w-64 h-64 lg:w-80 lg:h-80 rounded-full border-4 flex items-center justify-center ${isDark() ? 'border-cyan-500/30 bg-slate-800/50' : 'border-cyan-500/30 bg-slate-100'}`}>
-              <div class="text-center">
-                <div class="text-5xl lg:text-6xl font-black">
-                  <span class="text-[#e63946]">K</span><span class="text-[#1d4ed8]">B</span>
-                </div>
-                <p class={`text-xs mt-2 font-medium ${isDark() ? 'text-slate-500' : 'text-slate-400'}`}>KRRISH IT SERVICE</p>
-              </div>
             </div>
           </div>
         </div>
