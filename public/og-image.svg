@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Krrish IT Service</title>
+  <desc id="desc">Krrish IT Service logo preview for social sharing</desc>
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <g transform="translate(145 115)">
+    <path d="M0 0h78L268 205l-63 63L0 47z" fill="#ef4444" opacity="0.95"/>
+    <path d="M137 0h88L55 177V93z" fill="#2563eb" opacity="0.95"/>
+    <path d="M97 238l65 65H74L0 229l58-58z" fill="#ef4444" opacity="0.95"/>
+    <path d="M172 168l116 135h-91L113 217z" fill="#ef4444" opacity="0.9"/>
+  </g>
+  <text x="420" y="290" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="195" font-weight="800" letter-spacing="-8" fill="#1f1f24">rrish</text>
+  <g transform="translate(180 430)">
+    <line x1="0" y1="35" x2="190" y2="35" stroke="#17171b" stroke-width="6" stroke-linecap="round"/>
+    <text x="215" y="55" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="68" font-weight="600" letter-spacing="8" fill="#1f1f24">IT SERVICE</text>
+    <line x1="650" y1="35" x2="840" y2="35" stroke="#17171b" stroke-width="6" stroke-linecap="round"/>
+  </g>
+</svg>
