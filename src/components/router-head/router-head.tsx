@@ -9,6 +9,7 @@ const DEFAULT_DESCRIPTION =
 const DEFAULT_KEYWORDS =
   "Krrish IT, Kerols Badr, software engineer, full-stack developer, server admin, Node.js developer, PHP Laravel developer, MongoDB, MySQL, Linux server administration, DevOps, web development Egypt";
 const OG_IMAGE = `${SITE_URL}/og-image.svg`;
+const ARABIC_FONT_URL = "https://fonts.googleapis.com/css2?family=Noto+" + "Kufi+Arabic:wght@400;500;600;700;800&display=swap";
 
 /**
  * The RouterHead component is placed inside of the document `<head>` element.
@@ -67,6 +68,9 @@ export const RouterHead = component$(() => {
       <meta name="twitter:image" content={OG_IMAGE} />
       <meta name="twitter:image:alt" content="Krrish IT Service logo" />
 
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link rel="stylesheet" href={ARABIC_FONT_URL} />
       <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       <link rel="apple-touch-icon" href="/favicon.svg" />
       <link rel="preload" as="image" href="/og-image.svg" />
