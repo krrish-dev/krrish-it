@@ -14,6 +14,7 @@ export default component$(() => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: email.value,
@@ -24,7 +25,18 @@ export default component$(() => {
       const data = await res.json();
 
       if (res.ok) {
-        window.location.href = '/admin';
+        const sessionCheck = await fetch('/api/auth/me', {
+          method: 'GET',
+          credentials: 'include',
+          cache: 'no-store',
+        });
+
+        if (sessionCheck.ok) {
+          window.location.href = '/admin/';
+          return;
+        }
+
+        error.value = 'Login succeeded, but the session cookie was not saved. Please clear cache and try again.';
       } else {
         error.value = data.error || 'Login failed';
       }
