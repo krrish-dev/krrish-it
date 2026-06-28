@@ -2,8 +2,10 @@
   "name": "my-qwik-empty-starter",
   "description": "Blank project with routing included",
   "engines": {
-    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
+    "node": "22.x",
+    "pnpm": "11.9.0"
   },
+  "packageManager": "pnpm@11.9.0",
   "engines-annotation": "Mostly required by sharp which needs a Node-API v9 compatible runtime",
   "private": true,
   "type": "module",
@@ -20,7 +22,7 @@
     "fmt.check": "prettier --check .",
     "lint": "eslint \"src/**/*.ts*\"",
     "preview": "qwik build preview && vite preview --open",
-    "start": "vite --open --mode ssr",
+    "start": "vite --host 0.0.0.0 --mode ssr",
     "qwik": "qwik"
   },
   "devDependencies": {
