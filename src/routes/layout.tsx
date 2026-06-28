@@ -1,4 +1,4 @@
-import { component$, Slot, useSignal, useVisibleTask$ } from '@builder.io/qwik';
+import { component$, $, Slot, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import type { RequestHandler } from '@builder.io/qwik-city';
 import { useLocation } from '@builder.io/qwik-city';
 
