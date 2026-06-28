@@ -100,50 +100,62 @@ export default component$(() => {
     <>
       <section
         id="about"
-        class={`relative min-h-[680px] px-6 lg:px-12 py-24 lg:py-32 overflow-hidden flex items-center ${isAr() ? 'font-arabic' : ''}`}
-        style={{
-          backgroundImage: `linear-gradient(90deg, rgba(15,23,42,0.08) 0%, rgba(15,23,42,0.20) 34%, rgba(15,23,42,0.82) 58%, rgba(15,23,42,0.98) 100%), url("${heroImage()}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
+        class={`relative min-h-[700px] lg:min-h-[780px] overflow-hidden flex items-center ${isAr() ? 'font-arabic' : ''}`}
       >
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_78%_35%,rgba(6,182,212,0.18),transparent_30%),radial-gradient(circle_at_92%_72%,rgba(29,78,216,0.18),transparent_26%)] pointer-events-none"></div>
-        <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0f172a] to-transparent pointer-events-none"></div>
+        <img
+          src={heroImage()}
+          alt={isAr() ? 'كيرلس بدر - Krrish IT Service' : 'Kerols Badr - Krrish IT Service'}
+          class="absolute inset-0 h-full w-full object-cover select-none pointer-events-none"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
+        <div
+          class="absolute inset-0 pointer-events-none"
+          style={{
+            background: isAr()
+              ? 'linear-gradient(90deg, rgba(15,23,42,0.98) 0%, rgba(15,23,42,0.90) 30%, rgba(15,23,42,0.42) 58%, rgba(15,23,42,0.08) 100%)'
+              : 'linear-gradient(90deg, rgba(15,23,42,0.08) 0%, rgba(15,23,42,0.42) 42%, rgba(15,23,42,0.90) 70%, rgba(15,23,42,0.98) 100%)',
+          }}
+        />
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_76%_35%,rgba(6,182,212,0.14),transparent_28%),radial-gradient(circle_at_88%_78%,rgba(29,78,216,0.14),transparent_26%)] pointer-events-none"></div>
+        <div class="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#0f172a] to-transparent pointer-events-none"></div>
 
-        <div class="relative z-10 max-w-6xl mx-auto w-full flex justify-end">
-          <div class={`w-full max-w-xl ${isAr() ? 'text-right' : 'text-left'}`}>
-            <p class="text-sm font-semibold uppercase tracking-widest mb-4 text-cyan-400">
-              {isAr() ? 'مرحباً، أنا' : "Hi, I'm"}
-            </p>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 leading-tight drop-shadow-xl">
-              {isAr() ? (
-                <>
-                  <span class="text-[#e63946]">كيرلس</span>{' '}
-                  <span class="text-[#1d4ed8]">بدر</span>
-                </>
-              ) : (
-                <>
-                  <span class="text-[#e63946]">K</span>erols{' '}
-                  <span class="text-[#1d4ed8]">B</span>adr
-                </>
-              )}
-            </h1>
-            <h2 class="text-xl md:text-2xl font-semibold mb-6 text-slate-200 drop-shadow">
-              {isAr() ? 'مهندس برمجيات ومدير سيرفرات' : 'Software Engineer & Server Admin'}
-            </h2>
-            <p class="text-base md:text-lg leading-relaxed mb-8 text-slate-300 drop-shadow max-w-xl">
-              {isAr()
-                ? 'مهندس برمجيات بخبرة تقارب 10 سنوات في تطوير البرمجيات وإدارة السيرفرات. أقدم حلول ويب متكاملة تشمل مواقع الشركات، المتاجر الإلكترونية، أنظمة الإدارة، ربط قواعد البيانات، وتأمين ونشر التطبيقات على السيرفرات.'
-                : 'Software Engineer with ~10 years working across servers and software. Delivers end-to-end projects including company websites, e-commerce stores, admin systems, database integrations, and secure production deployments.'}
-            </p>
-            <div class={`flex flex-col sm:flex-row gap-4 ${isAr() ? 'justify-end' : 'justify-start'}`}>
-              <a href="#contact" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-8 py-3.5 rounded-xl font-bold hover:opacity-90 transition-all text-center shadow-lg shadow-cyan-500/20">
-                {isAr() ? 'تواصل معي' : 'Get in Touch'}
-              </a>
-              <a href="#services" class="px-8 py-3.5 rounded-xl font-bold transition-all text-center border border-slate-600 hover:border-cyan-500 hover:bg-slate-800/80 bg-slate-950/20 backdrop-blur-sm">
-                {isAr() ? 'اعرف المزيد' : 'Learn More'}
-              </a>
+        <div class="relative z-10 w-full px-6 lg:px-12 py-24 lg:py-32">
+          <div class={`max-w-6xl mx-auto w-full flex ${isAr() ? 'justify-start' : 'justify-end'}`}>
+            <div class={`w-full max-w-xl ${isAr() ? 'text-right' : 'text-left'}`}>
+              <p class="text-sm font-semibold uppercase tracking-widest mb-4 text-cyan-400">
+                {isAr() ? 'مرحباً، أنا' : "Hi, I'm"}
+              </p>
+              <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 leading-tight drop-shadow-xl">
+                {isAr() ? (
+                  <>
+                    <span class="text-[#e63946]">كيرلس</span>{' '}
+                    <span class="text-[#1d4ed8]">بدر</span>
+                  </>
+                ) : (
+                  <>
+                    <span class="text-[#e63946]">K</span>erols{' '}
+                    <span class="text-[#1d4ed8]">B</span>adr
+                  </>
+                )}
+              </h1>
+              <h2 class="text-xl md:text-2xl font-semibold mb-6 text-slate-200 drop-shadow">
+                {isAr() ? 'مهندس برمجيات ومدير سيرفرات' : 'Software Engineer & Server Admin'}
+              </h2>
+              <p class="text-base md:text-lg leading-relaxed mb-8 text-slate-300 drop-shadow max-w-xl">
+                {isAr()
+                  ? 'مهندس برمجيات بخبرة تقارب 10 سنوات في تطوير البرمجيات وإدارة السيرفرات. أقدم حلول ويب متكاملة تشمل مواقع الشركات، المتاجر الإلكترونية، أنظمة الإدارة، ربط قواعد البيانات، وتأمين ونشر التطبيقات على السيرفرات.'
+                  : 'Software Engineer with ~10 years working across servers and software. Delivers end-to-end projects including company websites, e-commerce stores, admin systems, database integrations, and secure production deployments.'}
+              </p>
+              <div class={`flex flex-col sm:flex-row gap-4 ${isAr() ? 'justify-end' : 'justify-start'}`}>
+                <a href="#contact" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-8 py-3.5 rounded-xl font-bold hover:opacity-90 transition-all text-center shadow-lg shadow-cyan-500/20">
+                  {isAr() ? 'تواصل معي' : 'Get in Touch'}
+                </a>
+                <a href="#services" class="px-8 py-3.5 rounded-xl font-bold transition-all text-center border border-slate-600 hover:border-cyan-500 hover:bg-slate-800/80 bg-slate-950/20 backdrop-blur-sm">
+                  {isAr() ? 'اعرف المزيد' : 'Learn More'}
+                </a>
+              </div>
             </div>
           </div>
         </div>
