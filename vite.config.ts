@@ -57,6 +57,9 @@ export default defineConfig(({ command, mode }): UserConfig => {
     server: {
       host: "0.0.0.0",
       allowedHosts,
+      hmr: {
+        overlay: false,
+      },
       headers: {
         // Don't cache the server response in dev mode
         "Cache-Control": "public, max-age=0",
