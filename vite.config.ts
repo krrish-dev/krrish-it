@@ -24,6 +24,12 @@ const allowedHosts = [
   "krrish-it.netlify.app",
 ];
 
+const noStoreHeaders = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+  Pragma: "no-cache",
+  Expires: "0",
+};
+
 /**
  * Note that Vite normally starts from `index.html` but the qwikCity plugin makes start at `src/entry.ssr.tsx` instead.
  */
@@ -60,18 +66,12 @@ export default defineConfig(({ command, mode }): UserConfig => {
       hmr: {
         overlay: false,
       },
-      headers: {
-        // Don't cache the server response in dev mode
-        "Cache-Control": "public, max-age=0",
-      },
+      headers: noStoreHeaders,
     },
     preview: {
       host: "0.0.0.0",
       allowedHosts,
-      headers: {
-        // Do cache the server response in preview (non-adapter production build)
-        "Cache-Control": "public, max-age=600",
-      },
+      headers: noStoreHeaders,
     },
   };
 });
