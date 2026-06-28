@@ -10,7 +10,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "qwik build",
+    "build": "qwik build preview",
+    "build.digitalocean": "qwik build preview",
+    "build.netlify": "qwik build",
     "build.client": "vite build",
     "build.preview": "vite build --ssr src/entry.preview.tsx",
     "build.server": "vite build -c adapters/netlify-edge/vite.config.ts",
