@@ -9,7 +9,6 @@
   --color-krrish-blue: #1d4ed8;
 }
 
-/* Custom base styles */
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -20,13 +19,20 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* RTL support for Arabic */
   [dir="rtl"], .font-arabic {
     font-family: Noto\ Kufi\ Arabic, Cairo, 'Segoe UI', sans-serif;
   }
 }
 
-/* Dark mode support */
+html[dir="rtl"] #about > img {
+  transform: scaleX(-1);
+}
+
+html[dir="ltr"] #about > img,
+html:not([dir]) #about > img {
+  transform: none;
+}
+
 .dark {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
