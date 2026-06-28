@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Setup | Krrish IT</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: radial-gradient(circle at top left, rgba(6, 182, 212, .18), transparent 34rem), linear-gradient(180deg, #020617, #0f172a); color: #fff; }
+      .card { width: min(460px, 100%); border: 1px solid rgba(148, 163, 184, .18); background: rgba(15, 23, 42, .92); border-radius: 24px; padding: 30px; box-shadow: 0 24px 80px rgba(0,0,0,.35); }
+      h1 { margin: 0 0 6px; font-size: 1.8rem; letter-spacing: -.04em; }
+      p { margin: 0 0 24px; color: #94a3b8; line-height: 1.7; }
+      label { display: block; margin: 14px 0 7px; color: #cbd5e1; font-size: .92rem; font-weight: 700; }
+      input { width: 100%; border: 1px solid rgba(148, 163, 184, .22); background: #020617; color: #fff; border-radius: 14px; padding: 13px 14px; font: inherit; outline: none; }
+      input:focus { border-color: #06b6d4; box-shadow: 0 0 0 4px rgba(6,182,212,.12); }
+      button, a.btn { display: inline-flex; justify-content: center; align-items: center; width: 100%; border: 0; border-radius: 14px; padding: 13px 16px; margin-top: 18px; color: #fff; background: linear-gradient(135deg, #06b6d4, #2563eb); font: inherit; font-weight: 900; cursor: pointer; text-decoration: none; }
+      .secondary { background: transparent !important; border: 1px solid rgba(148, 163, 184, .22) !important; color: #cbd5e1 !important; }
+      .msg { min-height: 24px; margin-top: 14px; color: #67e8f9; font-weight: 700; line-height: 1.6; }
+      .logo { font-size: 1.35rem; font-weight: 900; margin-bottom: 22px; }
+      .logo .k { color: #e63946; }
+      .logo .it { color: #2563eb; }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="logo"><span class="k">K</span>rrish<span class="it">.it</span></div>
+      <h1>Create first admin</h1>
+      <p>This creates the first admin user and initializes MongoDB collections/indexes. It only works once.</p>
+
+      <form id="setup-form">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" autocomplete="name" required />
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" required />
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" required minlength="8" />
+
+        <button type="submit">Create admin</button>
+        <a class="btn secondary" href="/admin/login">Back to login</a>
+        <div class="msg" id="msg" role="status" aria-live="polite"></div>
+      </form>
+    </main>
+
+    <script>
+      const form = document.getElementById('setup-form');
+      const msg = document.getElementById('msg');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        msg.textContent = 'Creating admin and initializing database...';
+
+        const body = Object.fromEntries(new FormData(form).entries());
+
+        try {
+          const response = await fetch('/api/auth/setup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.error || 'Setup failed');
+
+          msg.textContent = 'Admin created. Redirecting to login...';
+          setTimeout(() => { window.location.href = '/admin/login'; }, 900);
+        } catch (error) {
+          msg.textContent = error.message || 'Network error. Please try again.';
+        }
+      });
+    </script>
+  </body>
+</html>
