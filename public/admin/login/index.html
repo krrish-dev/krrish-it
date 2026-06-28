@@ -1,111 +1,46 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin Login | Krrish IT</title>
-    <style>
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        padding: 24px;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: radial-gradient(circle at top left, rgba(6, 182, 212, .18), transparent 34rem), linear-gradient(180deg, #020617, #0f172a);
-        color: #fff;
-      }
-      .card {
-        width: min(430px, 100%);
-        border: 1px solid rgba(148, 163, 184, .18);
-        background: rgba(15, 23, 42, .92);
-        border-radius: 24px;
-        padding: 30px;
-        box-shadow: 0 24px 80px rgba(0,0,0,.35);
-      }
-      h1 { margin: 0 0 6px; font-size: 1.8rem; letter-spacing: -.04em; }
-      p { margin: 0 0 24px; color: #94a3b8; line-height: 1.7; }
-      label { display: block; margin: 14px 0 7px; color: #cbd5e1; font-size: .92rem; font-weight: 700; }
-      input {
-        width: 100%;
-        border: 1px solid rgba(148, 163, 184, .22);
-        background: #020617;
-        color: #fff;
-        border-radius: 14px;
-        padding: 13px 14px;
-        font: inherit;
-        outline: none;
-      }
-      input:focus { border-color: #06b6d4; box-shadow: 0 0 0 4px rgba(6,182,212,.12); }
-      button, a.btn {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        border: 0;
-        border-radius: 14px;
-        padding: 13px 16px;
-        margin-top: 18px;
-        color: #fff;
-        background: linear-gradient(135deg, #06b6d4, #2563eb);
-        font: inherit;
-        font-weight: 900;
-        cursor: pointer;
-        text-decoration: none;
-      }
-      .secondary { background: transparent !important; border: 1px solid rgba(148, 163, 184, .22) !important; color: #cbd5e1 !important; }
-      .msg { min-height: 24px; margin-top: 14px; color: #67e8f9; font-weight: 700; }
-      .logo { font-size: 1.35rem; font-weight: 900; margin-bottom: 22px; }
-      .logo .k { color: #e63946; }
-      .logo .it { color: #2563eb; }
-    </style>
-  </head>
-  <body>
-    <main class="card">
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Login | Krrish IT</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <style>
+    :root{color-scheme:dark;--bg:#020617;--card:rgba(15,23,42,.92);--text:#fff;--muted:#94a3b8;--border:rgba(148,163,184,.18);--input:#e8f1ff;--input-text:#000}
+    :root.light{color-scheme:light;--bg:#f8fafc;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;--input:#fff;--input-text:#0f172a}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top left,rgba(6,182,212,.18),transparent 34rem),linear-gradient(180deg,var(--bg),#0f172a);color:var(--text)}
+    body[dir="rtl"]{font-family:Cairo,"Segoe UI",Tahoma,sans-serif}
+    .card{width:min(430px,100%);border:1px solid var(--border);background:var(--card);border-radius:24px;padding:30px;box-shadow:0 24px 80px rgba(0,0,0,.25)}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}.logo{font-size:1.35rem;font-weight:900}.logo .k{color:#e63946}.logo .it{color:#2563eb}.controls{display:flex;gap:8px}.pill{border:1px solid var(--border);background:transparent;color:var(--text);border-radius:999px;padding:8px 10px;font-weight:900;cursor:pointer}
+    h1{margin:0 0 8px;font-size:1.9rem;letter-spacing:-.04em}p{margin:0 0 24px;color:var(--muted);line-height:1.7}label{display:block;margin:14px 0 7px;font-weight:800}input{width:100%;border:1px solid var(--border);background:var(--input);color:var(--input-text);border-radius:14px;padding:13px 14px;font:inherit;outline:none}button.submit{width:100%;border:0;border-radius:14px;padding:13px 16px;margin-top:18px;color:#fff;background:linear-gradient(135deg,#06b6d4,#2563eb);font:inherit;font-weight:900;cursor:pointer}.msg{min-height:24px;margin-top:14px;color:#67e8f9;font-weight:800;line-height:1.6}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="top">
       <div class="logo"><span class="k">K</span>rrish<span class="it">.it</span></div>
-      <h1>Admin Login</h1>
-      <p>Sign in to manage projects, blog posts, and contact messages.</p>
-
-      <form id="login-form">
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" autocomplete="email" required />
-
-        <label for="password">Password</label>
-        <input id="password" name="password" type="password" autocomplete="current-password" required />
-
-        <button type="submit">Sign in</button>
-        <a class="btn secondary" href="/admin/setup">Create first admin</a>
-        <div class="msg" id="msg" role="status" aria-live="polite"></div>
-      </form>
-    </main>
-
-    <script>
-      const form = document.getElementById('login-form');
-      const msg = document.getElementById('msg');
-
-      form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        msg.textContent = 'Signing in...';
-
-        const body = Object.fromEntries(new FormData(form).entries());
-
-        try {
-          const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-          });
-
-          const data = await response.json().catch(() => ({}));
-          if (!response.ok) throw new Error(data.error || 'Login failed');
-
-          msg.textContent = 'Login successful. Redirecting...';
-          window.location.href = '/admin';
-        } catch (error) {
-          msg.textContent = error.message || 'Network error. Please try again.';
-        }
-      });
-    </script>
-  </body>
+      <div class="controls"><button class="pill" id="theme-toggle" type="button">Light</button><button class="pill" id="lang-toggle" type="button">AR</button></div>
+    </div>
+    <h1 data-i18n="title">Admin Login</h1>
+    <p data-i18n="subtitle">Sign in to manage projects, blog posts, and contact messages.</p>
+    <form id="login-form">
+      <label data-i18n="email" for="email">Email</label>
+      <input id="email" name="email" type="email" autocomplete="email" required>
+      <label data-i18n="password" for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <button class="submit" data-i18n="signin" type="submit">Sign in</button>
+      <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    </form>
+  </main>
+  <script>
+    const tr={en:{title:'Admin Login',subtitle:'Sign in to manage projects, blog posts, and contact messages.',email:'Email',password:'Password',signin:'Sign in',signing:'Signing in...',success:'Login successful. Redirecting...',fail:'Login failed',network:'Network error. Please try again.'},ar:{title:'تسجيل دخول الإدارة',subtitle:'سجّل الدخول لإدارة المشاريع والمدونة ورسائل التواصل.',email:'البريد الإلكتروني',password:'كلمة المرور',signin:'تسجيل الدخول',signing:'جاري تسجيل الدخول...',success:'تم تسجيل الدخول. جاري التحويل...',fail:'فشل تسجيل الدخول',network:'خطأ في الاتصال. حاول مرة أخرى.'}};
+    let locale=localStorage.getItem('locale')||'en';let theme=localStorage.getItem('theme')||'dark';
+    function apply(){document.documentElement.lang=locale;document.body.dir=locale==='ar'?'rtl':'ltr';document.documentElement.classList.toggle('light',theme==='light');document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=tr[locale][e.dataset.i18n]||e.dataset.i18n);document.getElementById('lang-toggle').textContent=locale==='ar'?'EN':'AR';document.getElementById('theme-toggle').textContent=theme==='dark'?'Light':'Dark'}
+    document.getElementById('lang-toggle').onclick=()=>{locale=locale==='ar'?'en':'ar';localStorage.setItem('locale',locale);apply()};
+    document.getElementById('theme-toggle').onclick=()=>{theme=theme==='dark'?'light':'dark';localStorage.setItem('theme',theme);apply()};
+    apply();
+    document.getElementById('login-form').addEventListener('submit',async e=>{e.preventDefault();const msg=document.getElementById('msg');msg.textContent=tr[locale].signing;try{const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(e.target).entries()))});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||tr[locale].fail);msg.textContent=tr[locale].success;window.location.href='/admin'}catch(err){msg.textContent=err.message||tr[locale].network}});
+  </script>
+</body>
 </html>
