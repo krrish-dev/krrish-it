@@ -17,7 +17,12 @@ const { dependencies = {}, devDependencies = {} } = pkg as any as {
 };
 errorOnDuplicatesPkgDeps(devDependencies, dependencies);
 
-const allowedHosts = ["krrish-app-gsfu4.ondigitalocean.app"];
+const allowedHosts = [
+  "krrish-app-gsfu4.ondigitalocean.app",
+  "krrish.it",
+  "www.krrish.it",
+  "krrish-it.netlify.app",
+];
 
 /**
  * Note that Vite normally starts from `index.html` but the qwikCity plugin makes start at `src/entry.ssr.tsx` instead.
