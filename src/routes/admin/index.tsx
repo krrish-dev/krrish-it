@@ -4,6 +4,19 @@ import type { DocumentHead } from '@builder.io/qwik-city';
 const TOKEN_KEY = 'krrish_admin_token';
 
 type AdminTab = 'overview' | 'messages' | 'projects' | 'blog';
+type AdminApiPath = '/api/projects' | '/api/blog' | '/api/messages';
+
+function getAuthHeaders(): Record<string, string> {
+  const token = localStorage.getItem(TOKEN_KEY);
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function getJsonAuthHeaders(): Record<string, string> {
+  return {
+    'Content-Type': 'application/json',
+    ...getAuthHeaders(),
+  };
+}
 
 export default component$(() => {
   const activeTab = useSignal<AdminTab>('overview');
@@ -14,8 +27,7 @@ export default component$(() => {
   const status = useSignal('Checking authentication...');
 
   const loadData = $(async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
-    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const headers = getAuthHeaders();
 
     status.value = 'Loading...';
 
@@ -32,13 +44,13 @@ export default component$(() => {
     status.value = 'Ready';
   });
 
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
     const res = await fetch('/api/auth/me', {
       method: 'GET',
       credentials: 'include',
       cache: 'no-store',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      headers: getAuthHeaders(),
     });
 
     if (!res.ok) {
@@ -51,28 +63,23 @@ export default component$(() => {
   });
 
   const logout = $(async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
     await fetch('/api/auth/logout', {
       method: 'POST',
       credentials: 'include',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      headers: getAuthHeaders(),
     }).catch(() => null);
 
     localStorage.removeItem(TOKEN_KEY);
     window.location.href = '/admin/login/';
   });
 
-  const deleteItem = $(async (path: '/api/projects' | '/api/blog' | '/api/messages', id: string) => {
+  const deleteItem = $(async (path: AdminApiPath, id: string) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
 
-    const token = localStorage.getItem(TOKEN_KEY);
     const res = await fetch(path, {
       method: 'DELETE',
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: getJsonAuthHeaders(),
       body: JSON.stringify({ _id: id }),
     });
 
@@ -86,18 +93,13 @@ export default component$(() => {
   });
 
   const submitProject = $(async (event: Event) => {
-    event.preventDefault();
     const form = event.target as HTMLFormElement;
     const raw = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
-    const token = localStorage.getItem(TOKEN_KEY);
 
     const res = await fetch('/api/projects', {
       method: 'POST',
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: getJsonAuthHeaders(),
       body: JSON.stringify({
         ...raw,
         technologies: String(raw.technologies || '').split(',').map((item) => item.trim()).filter(Boolean),
@@ -116,18 +118,13 @@ export default component$(() => {
   });
 
   const submitBlog = $(async (event: Event) => {
-    event.preventDefault();
     const form = event.target as HTMLFormElement;
     const raw = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
-    const token = localStorage.getItem(TOKEN_KEY);
 
     const res = await fetch('/api/blog', {
       method: 'POST',
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: getJsonAuthHeaders(),
       body: JSON.stringify({
         ...raw,
         tags: String(raw.tags || '').split(',').map((item) => item.trim()).filter(Boolean),
