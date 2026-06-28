@@ -104,6 +104,7 @@
       async function api(path, options = {}) {
         const response = await fetch(path, {
           ...options,
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
         });
         const data = await response.json().catch(() => ({}));
@@ -113,11 +114,11 @@
 
       async function requireAuth() {
         try {
-          const data = await api('/api/auth/me');
+          const data = await api('/api/auth/me', { method: 'GET', cache: 'no-store' });
           document.getElementById('user-line').textContent = data.user?.email || 'Authenticated';
           return true;
         } catch {
-          window.location.href = '/admin/login';
+          window.location.href = '/admin/login/';
           return false;
         }
       }
@@ -205,7 +206,7 @@
 
       document.getElementById('logout').onclick = async () => {
         await api('/api/auth/logout', { method: 'POST' }).catch(() => null);
-        window.location.href = '/admin/login';
+        window.location.href = '/admin/login/';
       };
 
       document.getElementById('project-form').addEventListener('submit', async (event) => {
