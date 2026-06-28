@@ -21,8 +21,8 @@
   }
 
   /* RTL support for Arabic */
-  [dir="rtl"] {
-    font-family: 'Cairo', 'Segoe UI', sans-serif;
+  [dir="rtl"], .font-arabic {
+    font-family: Noto\ Kufi\ Arabic, Cairo, 'Segoe UI', sans-serif;
   }
 }
 
