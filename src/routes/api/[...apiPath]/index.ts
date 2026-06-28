@@ -7,7 +7,16 @@ export const onRequest: RequestHandler = async ({ request, headers, json, text }
   const contentType = response.headers.get('content-type') || '';
 
   response.headers.forEach((value, key) => {
-    headers.set(key, value);
+    const normalizedKey = key.toLowerCase();
+
+    if (normalizedKey === 'set-cookie') {
+      headers.append('Set-Cookie', value);
+      return;
+    }
+
+    if (normalizedKey !== 'content-length') {
+      headers.set(key, value);
+    }
   });
 
   if (response.status === 204) {
