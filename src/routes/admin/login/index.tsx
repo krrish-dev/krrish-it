@@ -1,34 +1,52 @@
 import { component$, useSignal, $ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
 
+const TOKEN_KEY = 'krrish_admin_token';
+
 export default component$(() => {
-  const email = useSignal('');
-  const password = useSignal('');
   const error = useSignal('');
   const loading = useSignal(false);
 
-  const handleLogin = $(async () => {
+  const handleLogin = $(async (event?: Event) => {
+    event?.preventDefault();
     error.value = '';
     loading.value = true;
 
     try {
+      const form = event?.target instanceof HTMLFormElement
+        ? event.target
+        : document.querySelector<HTMLFormElement>('#admin-login-form');
+      const formData = new FormData(form || undefined);
+      const email = String(formData.get('email') || '').trim();
+      const password = String(formData.get('password') || '');
+
+      if (!email || !password) {
+        error.value = 'Email and password are required.';
+        return;
+      }
+
+      localStorage.removeItem(TOKEN_KEY);
+
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email.value,
-          password: password.value,
-        }),
+        body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (res.ok) {
+        if (data.token) {
+          localStorage.setItem(TOKEN_KEY, data.token);
+        }
+
+        const token = localStorage.getItem(TOKEN_KEY);
         const sessionCheck = await fetch('/api/auth/me', {
           method: 'GET',
           credentials: 'include',
           cache: 'no-store',
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
         if (sessionCheck.ok) {
@@ -36,7 +54,7 @@ export default component$(() => {
           return;
         }
 
-        error.value = 'Login succeeded, but the session cookie was not saved. Please clear cache and try again.';
+        error.value = 'Login succeeded, but the session was not saved. Please clear cache and try again.';
       } else {
         error.value = data.error || 'Login failed';
       }
@@ -68,36 +86,39 @@ export default component$(() => {
             </div>
           )}
 
-          <div class="space-y-4">
+          <form id="admin-login-form" class="space-y-4" preventdefault:submit onSubmit$={handleLogin}>
             <div>
-              <label class="block text-sm font-medium text-slate-300 mb-2">Email</label>
+              <label class="block text-sm font-medium text-slate-300 mb-2" for="admin-email">Email</label>
               <input
+                id="admin-email"
+                name="email"
                 type="email"
-                value={email.value}
-                onInput$={(e) => email.value = (e.target as HTMLInputElement).value}
+                autocomplete="email"
                 class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-500"
                 placeholder="admin@krrish.it"
+                required
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-slate-300 mb-2">Password</label>
+              <label class="block text-sm font-medium text-slate-300 mb-2" for="admin-password">Password</label>
               <input
+                id="admin-password"
+                name="password"
                 type="password"
-                value={password.value}
-                onInput$={(e) => password.value = (e.target as HTMLInputElement).value}
-                onKeyDown$={(e) => { if (e.key === 'Enter') handleLogin(); }}
+                autocomplete="current-password"
                 class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-500"
                 placeholder="••••••••"
+                required
               />
             </div>
             <button
-              onClick$={handleLogin}
+              type="submit"
               disabled={loading.value}
               class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-50 mt-2"
             >
               {loading.value ? 'Signing in...' : 'Sign In'}
             </button>
-          </div>
+          </form>
         </div>
       </div>
     </div>
