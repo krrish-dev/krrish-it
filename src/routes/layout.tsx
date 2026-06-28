@@ -2,11 +2,15 @@ import { component$, $, Slot, useSignal, useVisibleTask$ } from '@builder.io/qwi
 import type { RequestHandler } from '@builder.io/qwik-city';
 import { useLocation } from '@builder.io/qwik-city';
 
-export const onGet: RequestHandler = async ({ cacheControl }) => {
+export const onGet: RequestHandler = async ({ cacheControl, headers }) => {
   cacheControl({
-    staleWhileRevalidate: 60 * 60 * 24 * 7,
-    maxAge: 5,
+    maxAge: 0,
+    sMaxAge: 0,
+    staleWhileRevalidate: 0,
   });
+  headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  headers.set('Pragma', 'no-cache');
+  headers.set('Expires', '0');
 };
 
 export default component$(() => {
