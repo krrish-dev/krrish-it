@@ -97,15 +97,21 @@
     </div>
 
     <script>
+      const TOKEN_KEY = 'krrish_admin_token';
       const state = { projects: [], blog: [], messages: [] };
       const statusEl = document.getElementById('status');
       const setStatus = (text) => { statusEl.textContent = text || ''; };
 
       async function api(path, options = {}) {
+        const token = localStorage.getItem(TOKEN_KEY);
         const response = await fetch(path, {
           ...options,
           credentials: 'include',
-          headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(options.headers || {}),
+          },
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || 'Request failed');
@@ -206,6 +212,7 @@
 
       document.getElementById('logout').onclick = async () => {
         await api('/api/auth/logout', { method: 'POST' }).catch(() => null);
+        localStorage.removeItem(TOKEN_KEY);
         window.location.href = '/admin/login/';
       };
 
