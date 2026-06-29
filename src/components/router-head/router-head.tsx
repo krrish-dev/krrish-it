@@ -3,25 +3,259 @@ import { useDocumentHead, useLocation } from "@builder.io/qwik-city";
 
 const SITE_URL = "https://krrish.it";
 const SITE_NAME = "Krrish IT Service";
-const DEFAULT_TITLE = "Krrish IT Service | Kerols Badr - Sviluppatore Web Full Stack";
-const DEFAULT_DESCRIPTION =
-  "Kerols Badr realizza siti web, applicazioni moderne, dashboard e soluzioni server sicure per aziende e professionisti.";
-const DEFAULT_KEYWORDS =
-  "Krrish IT, Kerols Badr, sviluppatore web, software engineer, full-stack developer, Node.js, PHP Laravel, server Linux, DevOps";
+const BRAND_ALTERNATES = ["Krrish.it", "Krrish IT", "Krrish"];
+const GITHUB_URL = "https://github.com/krrish-dev";
+const CONTACT_EMAIL = "kerolsbadr@gmail.com";
 const OG_IMAGE = `${SITE_URL}/og-image.svg`;
 const ARABIC_FONT_URL = "https://fonts.googleapis.com/css2?family=Noto+" + "Kufi+Arabic:wght@400;500;600;700;800&display=swap";
 
+const seoByLocale = {
+  it: {
+    lang: "it",
+    ogLocale: "it_IT",
+    url: `${SITE_URL}/`,
+    label: "Italiano",
+    title: "Kerols Badr | Sviluppatore Web Full Stack & Server Admin",
+    description:
+      "Krrish IT Service offre sviluppo web, dashboard, API, Laravel, Node.js, gestione server Linux, Nginx, SSL e deployment sicuro da remoto.",
+    keywords:
+      "Kerols Badr, Krrish IT, sviluppatore web full stack, server admin, Node.js, Laravel, Linux, Nginx, DevOps, DigitalOcean, Netlify",
+    breadcrumb: "Home",
+    profileName: "Kerols Badr - Sviluppatore Web Full Stack & Server Admin",
+  },
+  en: {
+    lang: "en",
+    ogLocale: "en_US",
+    url: `${SITE_URL}/en/`,
+    label: "English",
+    title: "Kerols Badr | Full-Stack Developer & Server Admin",
+    description:
+      "Full-stack web developer and server admin building websites, dashboards, APIs, Laravel and Node.js apps, MongoDB/MySQL integrations, and secure production deployments.",
+    keywords:
+      "Kerols Badr, Krrish IT, Full-Stack Developer, Software Engineer, Server Admin, Node.js, Laravel, MongoDB, MySQL, Linux, DevOps, Web Development Egypt",
+    breadcrumb: "English",
+    profileName: "Kerols Badr - Full-Stack Developer & Server Admin",
+  },
+  ar: {
+    lang: "ar",
+    ogLocale: "ar_EG",
+    url: `${SITE_URL}/ar/`,
+    label: "العربية",
+    title: "كيرلس بدر | مطور Full-Stack ومدير سيرفرات",
+    description:
+      "خدمات تطوير مواقع وتطبيقات ويب، لوحات تحكم، APIs، Laravel، Node.js، MongoDB، MySQL، إدارة سيرفرات Linux، Nginx، SSL والنشر الآمن.",
+    keywords:
+      "كيرلس بدر, Krrish IT, مطور Full-Stack, مهندس برمجيات, مدير سيرفرات, تطوير مواقع, Laravel, Node.js, MongoDB, MySQL, Linux, DevOps",
+    breadcrumb: "العربية",
+    profileName: "كيرلس بدر - مطور Full-Stack ومدير سيرفرات",
+  },
+} as const;
+
+type Locale = keyof typeof seoByLocale;
+
 const alternateLocales = [
-  { hreflang: "it-IT", href: `${SITE_URL}/` },
+  { hreflang: "it", href: `${SITE_URL}/` },
   { hreflang: "en", href: `${SITE_URL}/en/` },
   { hreflang: "ar", href: `${SITE_URL}/ar/` },
   { hreflang: "x-default", href: `${SITE_URL}/` },
 ];
 
-const getOgLocale = (pathname: string) => {
-  if (pathname.startsWith("/ar")) return "ar_EG";
-  if (pathname.startsWith("/en")) return "en_US";
-  return "it_IT";
+const knowsAbout = [
+  "Full-Stack Web Development",
+  "Software Engineering",
+  "Node.js",
+  "Laravel",
+  "PHP",
+  "Qwik",
+  "JavaScript",
+  "TypeScript",
+  "MongoDB",
+  "MySQL",
+  "Linux Server Administration",
+  "Nginx",
+  "SSL Configuration",
+  "Server Security",
+  "DevOps",
+  "DigitalOcean",
+  "Netlify",
+];
+
+const serviceTypes = [
+  "Full-Stack Web Development",
+  "Professional Website Development",
+  "Dashboard and Admin Panel Development",
+  "API Development",
+  "Server Administration",
+  "Linux Server Management",
+  "Nginx Configuration",
+  "SSL Setup",
+  "DevOps Deployment",
+  "Node.js Development",
+  "PHP Laravel Development",
+  "MongoDB and MySQL Integration",
+];
+
+const getLocaleFromPath = (pathname: string): Locale => {
+  if (pathname.startsWith("/ar")) return "ar";
+  if (pathname.startsWith("/en")) return "en";
+  return "it";
+};
+
+const getCanonicalPath = (pathname: string) => {
+  if (pathname === "/" || pathname === "") return "/";
+  if (pathname === "/en" || pathname.startsWith("/en/")) return "/en/";
+  if (pathname === "/ar" || pathname.startsWith("/ar/")) return "/ar/";
+  return pathname;
+};
+
+const getHeadMetaContent = (
+  meta: ReturnType<typeof useDocumentHead>["meta"],
+  attribute: "name" | "property",
+  value: string,
+) => {
+  const match = meta.find((item) => (item as Record<string, unknown>)[attribute] === value);
+  return typeof match?.content === "string" ? match.content : "";
+};
+
+const buildBreadcrumb = (locale: Locale, canonicalUrl: string) => {
+  const localeData = seoByLocale[locale];
+
+  if (locale === "it") {
+    return [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Krrish IT Service",
+        item: canonicalUrl,
+      },
+    ];
+  }
+
+  return [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Krrish IT Service",
+      item: `${SITE_URL}/`,
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: localeData.breadcrumb,
+      item: canonicalUrl,
+    },
+  ];
+};
+
+const buildStructuredData = (locale: Locale, canonicalUrl: string, pageTitle: string, pageDescription: string) => {
+  const localeData = seoByLocale[locale];
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        url: `${SITE_URL}/`,
+        name: SITE_NAME,
+        alternateName: BRAND_ALTERNATES,
+        inLanguage: ["it", "en", "ar"],
+        publisher: {
+          "@id": `${SITE_URL}/#organization`,
+        },
+      },
+      {
+        "@type": "Person",
+        "@id": `${SITE_URL}/#kerols-badr`,
+        name: "Kerols Badr",
+        alternateName: ["كيرلس بدر", "Kerolos Badr", "Krrish"],
+        jobTitle: "Software Engineer & Server Admin",
+        url: `${SITE_URL}/`,
+        image: OG_IMAGE,
+        email: `mailto:${CONTACT_EMAIL}`,
+        sameAs: [GITHUB_URL],
+        knowsAbout,
+        worksFor: {
+          "@id": `${SITE_URL}/#organization`,
+        },
+      },
+      {
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
+        name: SITE_NAME,
+        alternateName: BRAND_ALTERNATES,
+        url: `${SITE_URL}/`,
+        logo: `${SITE_URL}/favicon.svg`,
+        image: OG_IMAGE,
+        email: CONTACT_EMAIL,
+        sameAs: [GITHUB_URL],
+        founder: {
+          "@id": `${SITE_URL}/#kerols-badr`,
+        },
+        contactPoint: [
+          {
+            "@type": "ContactPoint",
+            contactType: "sales",
+            email: CONTACT_EMAIL,
+            availableLanguage: ["Arabic", "English", "Italian"],
+          },
+        ],
+      },
+      {
+        "@type": "ProfessionalService",
+        "@id": `${SITE_URL}/#professional-service`,
+        name: SITE_NAME,
+        alternateName: BRAND_ALTERNATES,
+        url: `${SITE_URL}/`,
+        image: OG_IMAGE,
+        logo: `${SITE_URL}/favicon.svg`,
+        description: pageDescription,
+        founder: {
+          "@id": `${SITE_URL}/#kerols-badr`,
+        },
+        areaServed: ["Egypt", "Italy", "Worldwide"],
+        availableLanguage: ["ar", "en", "it"],
+        serviceType: serviceTypes,
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "Web development, server administration, and deployment services",
+          itemListElement: serviceTypes.map((serviceName) => ({
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: serviceName,
+              provider: {
+                "@id": `${SITE_URL}/#organization`,
+              },
+            },
+          })),
+        },
+      },
+      {
+        "@type": "ProfilePage",
+        "@id": `${canonicalUrl}#profile-page`,
+        url: canonicalUrl,
+        name: localeData.profileName,
+        headline: pageTitle,
+        description: pageDescription,
+        inLanguage: localeData.lang,
+        isPartOf: {
+          "@id": `${SITE_URL}/#website`,
+        },
+        breadcrumb: {
+          "@id": `${canonicalUrl}#breadcrumb`,
+        },
+        mainEntity: {
+          "@id": `${SITE_URL}/#kerols-badr`,
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${canonicalUrl}#breadcrumb`,
+        itemListElement: buildBreadcrumb(locale, canonicalUrl),
+      },
+    ],
+  };
 };
 
 /**
@@ -30,14 +264,20 @@ const getOgLocale = (pathname: string) => {
 export const RouterHead = component$(() => {
   const head = useDocumentHead();
   const loc = useLocation();
-  const canonicalUrl = new URL(loc.url.pathname, SITE_URL).href;
+  const canonicalPath = getCanonicalPath(loc.url.pathname);
+  const canonicalUrl = `${SITE_URL}${canonicalPath}`;
   const isAdminRoute = loc.url.pathname.startsWith("/admin");
-  const ogLocale = getOgLocale(loc.url.pathname);
+  const locale = getLocaleFromPath(loc.url.pathname);
+  const localeData = seoByLocale[locale];
 
   const hasMeta = (attribute: "name" | "property", value: string) =>
     head.meta.some((meta) => (meta as Record<string, unknown>)[attribute] === value);
 
-  const pageTitle = head.title || DEFAULT_TITLE;
+  const pageTitle = head.title || localeData.title;
+  const pageDescription = getHeadMetaContent(head.meta, "name", "description") || localeData.description;
+  const pageKeywords = getHeadMetaContent(head.meta, "name", "keywords") || localeData.keywords;
+  const ogDescription = getHeadMetaContent(head.meta, "property", "og:description") || pageDescription;
+  const structuredData = buildStructuredData(locale, canonicalUrl, pageTitle, pageDescription);
 
   return (
     <>
@@ -60,21 +300,21 @@ export const RouterHead = component$(() => {
       <meta name="googlebot" content={isAdminRoute ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"} />
       <meta name="author" content="Kerols Badr" />
       <meta name="publisher" content={SITE_NAME} />
-      {!hasMeta("name", "description") && <meta name="description" content={DEFAULT_DESCRIPTION} />}
-      {!hasMeta("name", "keywords") && <meta name="keywords" content={DEFAULT_KEYWORDS} />}
+      {!hasMeta("name", "description") && <meta name="description" content={pageDescription} />}
+      {!hasMeta("name", "keywords") && <meta name="keywords" content={pageKeywords} />}
 
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:type" content={isAdminRoute ? "website" : "profile"} />
       <meta property="og:url" content={canonicalUrl} />
       {!hasMeta("property", "og:title") && <meta property="og:title" content={pageTitle} />}
-      {!hasMeta("property", "og:description") && <meta property="og:description" content={DEFAULT_DESCRIPTION} />}
+      {!hasMeta("property", "og:description") && <meta property="og:description" content={ogDescription} />}
       <meta property="og:image" content={OG_IMAGE} />
       <meta property="og:image:secure_url" content={OG_IMAGE} />
       <meta property="og:image:type" content="image/svg+xml" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:image:alt" content="Krrish IT Service logo" />
-      <meta property="og:locale" content={ogLocale} />
+      <meta property="og:locale" content={localeData.ogLocale} />
       <meta property="og:locale:alternate" content="it_IT" />
       <meta property="og:locale:alternate" content="en_US" />
       <meta property="og:locale:alternate" content="ar_EG" />
@@ -84,7 +324,7 @@ export const RouterHead = component$(() => {
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:url" content={canonicalUrl} />
       <meta name="twitter:title" content={pageTitle} />
-      <meta name="twitter:description" content={DEFAULT_DESCRIPTION} />
+      <meta name="twitter:description" content={pageDescription} />
       <meta name="twitter:image" content={OG_IMAGE} />
       <meta name="twitter:image:alt" content="Krrish IT Service logo" />
 
@@ -95,35 +335,12 @@ export const RouterHead = component$(() => {
       <link rel="apple-touch-icon" href="/favicon.svg" />
       <link rel="preload" as="image" href="/og-image.svg" />
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "ProfessionalService",
-          name: SITE_NAME,
-          url: SITE_URL,
-          image: OG_IMAGE,
-          logo: `${SITE_URL}/favicon.svg`,
-          description: DEFAULT_DESCRIPTION,
-          founder: {
-            "@type": "Person",
-            name: "Kerols Badr",
-            jobTitle: "Software Engineer & Server Admin",
-            url: SITE_URL,
-            sameAs: ["https://github.com/Krrish-dev"],
-          },
-          areaServed: ["Italy", "Egypt", "Worldwide"],
-          availableLanguage: ["ar", "en", "it"],
-          serviceType: [
-            "Full-Stack Web Development",
-            "Server Administration",
-            "Linux Server Management",
-            "DevOps Deployment",
-            "Node.js Development",
-            "PHP Laravel Development",
-          ],
-        })}
-      />
+      {!isAdminRoute && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={JSON.stringify(structuredData)}
+        />
+      )}
 
       {head.meta.map((m) => (
         <meta key={m.key} {...m} />
