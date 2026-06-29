@@ -24,15 +24,6 @@
   }
 }
 
-html[dir="rtl"] #about > img {
-  transform: scaleX(-1);
-}
-
-html[dir="ltr"] #about > img,
-html:not([dir]) #about > img {
-  transform: none;
-}
-
 .dark {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
