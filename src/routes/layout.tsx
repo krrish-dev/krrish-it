@@ -1,6 +1,48 @@
-import { component$, $, Slot, useSignal, useVisibleTask$ } from '@builder.io/qwik';
+import { $, component$, Slot, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import type { RequestHandler } from '@builder.io/qwik-city';
 import { useLocation } from '@builder.io/qwik-city';
+
+type Locale = 'it' | 'en' | 'ar';
+type ThemeMode = 'dark' | 'light';
+
+const navCopy = {
+  it: {
+    about: 'Chi sono',
+    services: 'Servizi',
+    skills: 'Stack',
+    contact: 'Contatto',
+    rights: 'Tutti i diritti riservati',
+    built: 'Creato con Qwik & MongoDB',
+    credibility:
+      "La mia lingua madre è l'arabo; posso comunicare in inglese e italiano con supporto di traduzione per mantenere chiarezza e precisione.",
+  },
+  en: {
+    about: 'About',
+    services: 'Services',
+    skills: 'Skills',
+    contact: 'Contact',
+    rights: 'All rights reserved',
+    built: 'Built with Qwik & MongoDB',
+    credibility:
+      'My native language is Arabic; English and Italian communication is supported with translation tools to keep the discussion clear and accurate.',
+  },
+  ar: {
+    about: 'حول',
+    services: 'الخدمات',
+    skills: 'المهارات',
+    contact: 'اتصل بي',
+    rights: 'جميع الحقوق محفوظة',
+    built: 'بُني باستخدام Qwik و MongoDB',
+    credibility:
+      'لغتي الأصلية العربية، ويمكنني التواصل بالإنجليزية والإيطالية بمساعدة أدوات ترجمة لضمان الوضوح والدقة.',
+  },
+} as const;
+
+const languageLinks = [
+  { locale: 'it', href: '/', label: 'Italiano' },
+  { locale: 'en', href: '/en/', label: 'English' },
+  { locale: 'ar', href: '/ar/', label: 'العربية' },
+] as const;
 
 export const onGet: RequestHandler = async ({ cacheControl, headers }) => {
   cacheControl({
@@ -14,18 +56,27 @@ export const onGet: RequestHandler = async ({ cacheControl, headers }) => {
 };
 
 export default component$(() => {
-  const theme = useSignal<'dark' | 'light'>('dark');
-  const locale = useSignal<'ar' | 'en'>('en');
+  const theme = useSignal<ThemeMode>('dark');
   const mobileMenuOpen = useSignal(false);
   const location = useLocation();
   const isAdmin = location.url.pathname.startsWith('/admin');
 
+  const getLocale = (): Locale => {
+    if (location.url.pathname.startsWith('/ar')) return 'ar';
+    if (location.url.pathname.startsWith('/en')) return 'en';
+    return 'it';
+  };
+
+  const getBasePath = (locale: Locale) => {
+    if (locale === 'ar') return '/ar/';
+    if (locale === 'en') return '/en/';
+    return '/';
+  };
+
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
-    // Load saved preferences
-    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light';
-    const savedLocale = localStorage.getItem('locale') as 'ar' | 'en';
+    const savedTheme = localStorage.getItem('theme') as ThemeMode | null;
     if (savedTheme) theme.value = savedTheme;
-    if (savedLocale) locale.value = savedLocale;
   });
 
   const toggleTheme = $(() => {
@@ -33,24 +84,23 @@ export default component$(() => {
     localStorage.setItem('theme', theme.value);
   });
 
-  const toggleLocale = $(() => {
-    locale.value = locale.value === 'ar' ? 'en' : 'ar';
-    localStorage.setItem('locale', locale.value);
-  });
-
   if (isAdmin) {
     return <Slot />;
   }
 
+  const locale = getLocale();
+  const labels = navCopy[locale];
+  const basePath = getBasePath(locale);
+  const dir = locale === 'ar' ? 'rtl' : 'ltr';
+
   return (
     <div
       class={`min-h-screen transition-colors duration-300 ${theme.value === 'dark' ? 'bg-[#0f172a] text-white' : 'bg-white text-slate-900'}`}
-      dir={locale.value === 'ar' ? 'rtl' : 'ltr'}
+      dir={dir}
+      lang={locale === 'it' ? 'it' : locale}
     >
-      {/* Navigation */}
       <nav class={`flex items-center justify-between px-6 lg:px-12 py-5 border-b backdrop-blur-md sticky top-0 z-50 transition-colors duration-300 ${theme.value === 'dark' ? 'border-slate-800 bg-[#0f172a]/80' : 'border-slate-200 bg-white/80'}`}>
-        {/* Logo */}
-        <a href="/" class="flex items-center gap-2">
+        <a href="/" class="flex items-center gap-2" aria-label="Krrish IT Service">
           <span class="text-2xl font-bold">
             <span class="text-[#e63946]">K</span>
             <span class={theme.value === 'dark' ? 'text-white' : 'text-slate-900'}>rrish</span>
@@ -58,33 +108,34 @@ export default component$(() => {
           </span>
         </a>
 
-        {/* Desktop Navigation */}
         <div class={`hidden md:flex items-center gap-8 text-sm font-medium ${theme.value === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-          <a href="#about" class="hover:text-[#06b6d4] transition-colors">
-            {locale.value === 'ar' ? 'حول' : 'About'}
+          <a href={`${basePath}#about`} class="hover:text-[#06b6d4] transition-colors">
+            {labels.about}
           </a>
-          <a href="#services" class="hover:text-[#06b6d4] transition-colors">
-            {locale.value === 'ar' ? 'الخدمات' : 'Services'}
+          <a href={`${basePath}#services`} class="hover:text-[#06b6d4] transition-colors">
+            {labels.services}
           </a>
-          <a href="#skills" class="hover:text-[#06b6d4] transition-colors">
-            {locale.value === 'ar' ? 'المهارات' : 'Skills'}
+          <a href={`${basePath}#skills`} class="hover:text-[#06b6d4] transition-colors">
+            {labels.skills}
           </a>
-          <a href="#contact" class="hover:text-[#06b6d4] transition-colors">
-            {locale.value === 'ar' ? 'اتصل بي' : 'Contact'}
+          <a href={`${basePath}#contact`} class="hover:text-[#06b6d4] transition-colors">
+            {labels.contact}
           </a>
         </div>
 
-        {/* Controls */}
         <div class="flex items-center gap-3">
-          {/* Language Toggle */}
-          <button
-            onClick$={toggleLocale}
-            class={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${theme.value === 'dark' ? 'border-slate-700 hover:border-cyan-500 text-slate-300' : 'border-slate-300 hover:border-cyan-500 text-slate-700'}`}
-          >
-            {locale.value === 'ar' ? 'EN' : 'عربي'}
-          </button>
+          <div class="hidden sm:flex items-center gap-1 rounded-xl border border-slate-700/70 p-1">
+            {languageLinks.map((item) => (
+              <a
+                key={item.locale}
+                href={item.href}
+                class={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${item.locale === locale ? 'bg-cyan-500/15 text-cyan-300' : theme.value === 'dark' ? 'text-slate-300 hover:text-cyan-300' : 'text-slate-700 hover:text-cyan-600'}`}
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
 
-          {/* Theme Toggle */}
           <button
             onClick$={toggleTheme}
             class={`p-2 rounded-lg border transition-all ${theme.value === 'dark' ? 'border-slate-700 hover:border-cyan-500 text-yellow-400' : 'border-slate-300 hover:border-cyan-500 text-slate-700'}`}
@@ -101,50 +152,56 @@ export default component$(() => {
             )}
           </button>
 
-          {/* Mobile Menu Button */}
           <button
-            onClick$={() => mobileMenuOpen.value = !mobileMenuOpen.value}
+            onClick$={() => (mobileMenuOpen.value = !mobileMenuOpen.value)}
             class="md:hidden p-2 rounded-lg"
             aria-label="Toggle menu"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={mobileMenuOpen.value ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={mobileMenuOpen.value ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
             </svg>
           </button>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       {mobileMenuOpen.value && (
         <div class={`md:hidden fixed inset-0 top-[73px] z-40 p-6 ${theme.value === 'dark' ? 'bg-[#0f172a]' : 'bg-white'}`}>
           <div class="flex flex-col gap-6 text-lg font-medium">
-            <a href="#about" onClick$={() => mobileMenuOpen.value = false} class="hover:text-[#06b6d4] transition-colors">
-              {locale.value === 'ar' ? 'حول' : 'About'}
+            <a href={`${basePath}#about`} onClick$={() => (mobileMenuOpen.value = false)} class="hover:text-[#06b6d4] transition-colors">
+              {labels.about}
             </a>
-            <a href="#services" onClick$={() => mobileMenuOpen.value = false} class="hover:text-[#06b6d4] transition-colors">
-              {locale.value === 'ar' ? 'الخدمات' : 'Services'}
+            <a href={`${basePath}#services`} onClick$={() => (mobileMenuOpen.value = false)} class="hover:text-[#06b6d4] transition-colors">
+              {labels.services}
             </a>
-            <a href="#skills" onClick$={() => mobileMenuOpen.value = false} class="hover:text-[#06b6d4] transition-colors">
-              {locale.value === 'ar' ? 'المهارات' : 'Skills'}
+            <a href={`${basePath}#skills`} onClick$={() => (mobileMenuOpen.value = false)} class="hover:text-[#06b6d4] transition-colors">
+              {labels.skills}
             </a>
-            <a href="#contact" onClick$={() => mobileMenuOpen.value = false} class="hover:text-[#06b6d4] transition-colors">
-              {locale.value === 'ar' ? 'اتصل بي' : 'Contact'}
+            <a href={`${basePath}#contact`} onClick$={() => (mobileMenuOpen.value = false)} class="hover:text-[#06b6d4] transition-colors">
+              {labels.contact}
             </a>
+            <div class="h-px bg-slate-700/50"></div>
+            {languageLinks.map((item) => (
+              <a
+                key={item.locale}
+                href={item.href}
+                onClick$={() => (mobileMenuOpen.value = false)}
+                class={`rounded-xl px-4 py-3 text-base font-bold ${item.locale === locale ? 'bg-cyan-500/15 text-cyan-300' : ''}`}
+              >
+                {item.label}
+              </a>
+            ))}
           </div>
         </div>
       )}
 
-      {/* Main Content */}
       <main>
         <Slot />
       </main>
 
-      {/* Footer */}
       <footer class={`px-6 lg:px-12 py-10 border-t text-center text-sm transition-colors duration-300 ${theme.value === 'dark' ? 'border-slate-800 text-slate-500' : 'border-slate-200 text-slate-500'}`}>
-        <p>© 2026 Krrish IT Service - {locale.value === 'ar' ? 'جميع الحقوق محفوظة' : 'All rights reserved'}</p>
-        <p class="mt-2">
-          {locale.value === 'ar' ? 'بُني باستخدام Qwik و MongoDB' : 'Built with Qwik & MongoDB'}
-        </p>
+        <p>© 2026 Krrish IT Service - {labels.rights}</p>
+        <p class="mt-2">{labels.built}</p>
+        <p class="mx-auto mt-3 max-w-3xl leading-relaxed">{labels.credibility}</p>
       </footer>
     </div>
   );
