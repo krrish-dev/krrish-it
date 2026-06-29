@@ -24,6 +24,16 @@
   }
 }
 
+@media (min-width: 1024px) {
+  #about[dir="ltr"] h1,
+  #about[dir="ltr"] h2,
+  #about[dir="ltr"] p,
+  #about[dir="ltr"] .inline-flex,
+  #about[dir="ltr"] a {
+    transform: translateX(28px);
+  }
+}
+
 .dark {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
