@@ -5,7 +5,9 @@ const SITE_URL = "https://krrish.it";
 const SITE_NAME = "Krrish IT Service";
 const BRAND_ALTERNATES = ["Krrish.it", "Krrish IT", "Krrish"];
 const GITHUB_URL = "https://github.com/krrish-dev";
+const LINKEDIN_URL = "https://www.linkedin.com/in/kerols-badr-tawfik-zaki";
 const CONTACT_EMAIL = "kerolsbadr@gmail.com";
+const PHONE_E164 = "+201091435488";
 const OG_IMAGE = `${SITE_URL}/og-image.svg`;
 const ARABIC_FONT_URL = "https://fonts.googleapis.com/css2?family=Noto+" + "Kufi+Arabic:wght@400;500;600;700;800&display=swap";
 
@@ -13,8 +15,6 @@ const seoByLocale = {
   it: {
     lang: "it",
     ogLocale: "it_IT",
-    url: `${SITE_URL}/`,
-    label: "Italiano",
     title: "Kerols Badr | Sviluppatore Web Full Stack & Server Admin",
     description:
       "Krrish IT Service offre sviluppo web, dashboard, API, Laravel, Node.js, gestione server Linux, Nginx, SSL e deployment sicuro da remoto.",
@@ -26,8 +26,6 @@ const seoByLocale = {
   en: {
     lang: "en",
     ogLocale: "en_US",
-    url: `${SITE_URL}/en/`,
-    label: "English",
     title: "Kerols Badr | Full-Stack Developer & Server Admin",
     description:
       "Full-stack web developer and server admin building websites, dashboards, APIs, Laravel and Node.js apps, MongoDB/MySQL integrations, and secure production deployments.",
@@ -39,8 +37,6 @@ const seoByLocale = {
   ar: {
     lang: "ar",
     ogLocale: "ar_EG",
-    url: `${SITE_URL}/ar/`,
-    label: "العربية",
     title: "كيرلس بدر | مطور Full-Stack ومدير سيرفرات",
     description:
       "خدمات تطوير مواقع وتطبيقات ويب، لوحات تحكم، APIs، Laravel، Node.js، MongoDB، MySQL، إدارة سيرفرات Linux، Nginx، SSL والنشر الآمن.",
@@ -95,6 +91,29 @@ const serviceTypes = [
   "MongoDB and MySQL Integration",
 ];
 
+const portfolioProjects = [
+  {
+    name: "Al Shorouk Academy",
+    url: "https://al-shorouk.academy/",
+    description: "Educational academy website project.",
+  },
+  {
+    name: "Learn Special English",
+    url: "https://www.learnspecialenglish.com/",
+    description: "English learning website project.",
+  },
+  {
+    name: "Pet Home Euthanasia Service",
+    url: "https://pethomeeuthanasiaservice.com/",
+    description: "Service website project for in-home pet euthanasia and related veterinary information.",
+  },
+  {
+    name: "ZAT.pro",
+    url: "https://zat.pro/",
+    description: "Contribution to the dynamic question algorithm for ZAT.pro.",
+  },
+];
+
 const getLocaleFromPath = (pathname: string): Locale => {
   if (pathname.startsWith("/ar")) return "ar";
   if (pathname.startsWith("/en")) return "en";
@@ -147,6 +166,26 @@ const buildBreadcrumb = (locale: Locale, canonicalUrl: string) => {
   ];
 };
 
+const buildPortfolioItemList = () => ({
+  "@type": "ItemList",
+  "@id": `${SITE_URL}/#portfolio`,
+  name: "Selected portfolio projects",
+  itemListElement: portfolioProjects.map((project, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    item: {
+      "@type": "WebSite",
+      "@id": `${project.url}#website`,
+      name: project.name,
+      url: project.url,
+      description: project.description,
+      contributor: {
+        "@id": `${SITE_URL}/#kerols-badr`,
+      },
+    },
+  })),
+});
+
 const buildStructuredData = (locale: Locale, canonicalUrl: string, pageTitle: string, pageDescription: string) => {
   const localeData = seoByLocale[locale];
 
@@ -173,8 +212,12 @@ const buildStructuredData = (locale: Locale, canonicalUrl: string, pageTitle: st
         url: `${SITE_URL}/`,
         image: OG_IMAGE,
         email: `mailto:${CONTACT_EMAIL}`,
-        sameAs: [GITHUB_URL],
+        telephone: PHONE_E164,
+        sameAs: [GITHUB_URL, LINKEDIN_URL],
         knowsAbout,
+        subjectOf: {
+          "@id": `${SITE_URL}/#portfolio`,
+        },
         worksFor: {
           "@id": `${SITE_URL}/#organization`,
         },
@@ -188,7 +231,8 @@ const buildStructuredData = (locale: Locale, canonicalUrl: string, pageTitle: st
         logo: `${SITE_URL}/favicon.svg`,
         image: OG_IMAGE,
         email: CONTACT_EMAIL,
-        sameAs: [GITHUB_URL],
+        telephone: PHONE_E164,
+        sameAs: [GITHUB_URL, LINKEDIN_URL],
         founder: {
           "@id": `${SITE_URL}/#kerols-badr`,
         },
@@ -197,6 +241,7 @@ const buildStructuredData = (locale: Locale, canonicalUrl: string, pageTitle: st
             "@type": "ContactPoint",
             contactType: "sales",
             email: CONTACT_EMAIL,
+            telephone: PHONE_E164,
             availableLanguage: ["Arabic", "English", "Italian"],
           },
         ],
@@ -209,13 +254,17 @@ const buildStructuredData = (locale: Locale, canonicalUrl: string, pageTitle: st
         url: `${SITE_URL}/`,
         image: OG_IMAGE,
         logo: `${SITE_URL}/favicon.svg`,
+        telephone: PHONE_E164,
         description: pageDescription,
         founder: {
           "@id": `${SITE_URL}/#kerols-badr`,
         },
-        areaServed: ["Egypt", "Italy", "Worldwide"],
+        areaServed: "Worldwide",
         availableLanguage: ["ar", "en", "it"],
         serviceType: serviceTypes,
+        subjectOf: {
+          "@id": `${SITE_URL}/#portfolio`,
+        },
         hasOfferCatalog: {
           "@type": "OfferCatalog",
           name: "Web development, server administration, and deployment services",
@@ -231,6 +280,7 @@ const buildStructuredData = (locale: Locale, canonicalUrl: string, pageTitle: st
           })),
         },
       },
+      buildPortfolioItemList(),
       {
         "@type": "ProfilePage",
         "@id": `${canonicalUrl}#profile-page`,
@@ -241,6 +291,9 @@ const buildStructuredData = (locale: Locale, canonicalUrl: string, pageTitle: st
         inLanguage: localeData.lang,
         isPartOf: {
           "@id": `${SITE_URL}/#website`,
+        },
+        hasPart: {
+          "@id": `${SITE_URL}/#portfolio`,
         },
         breadcrumb: {
           "@id": `${canonicalUrl}#breadcrumb`,
