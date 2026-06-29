@@ -4,7 +4,8 @@ import type { DocumentHead } from '@builder.io/qwik-city';
 type Locale = 'ar' | 'en';
 type ThemeMode = 'dark' | 'light';
 
-const HERO_ASSET_VERSION = 'hero-v20260629-02';
+const HERO_ASSET_VERSION = 'hero-v20260629-03';
+const WHATSAPP_ICON_VERSION = 'wa-v20260629-01';
 const WHATSAPP_PHONE = '201091435488';
 const WHATSAPP_MESSAGE = 'أنا مستخدم من krrish it وأريد التواصل معكم';
 
@@ -272,10 +273,25 @@ export default component$(() => {
         target="_blank"
         rel="noopener noreferrer"
         aria-label={isAr() ? 'تواصل واتساب' : 'Contact on WhatsApp'}
-        class={`fixed bottom-5 z-[80] flex items-center gap-3 rounded-full border border-emerald-300/35 bg-emerald-500 px-4 py-3 text-white shadow-2xl shadow-emerald-900/40 transition-all hover:-translate-y-1 hover:bg-emerald-400 ${isAr() ? 'left-4 sm:left-6' : 'right-4 sm:right-6'}`}
+        class={`group fixed bottom-5 z-[90] flex items-center gap-3 rounded-full border border-emerald-300/35 bg-emerald-500/95 px-3 py-3 text-white shadow-2xl shadow-emerald-900/45 ring-1 ring-white/10 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-emerald-400 ${isAr() ? 'left-4 sm:left-6' : 'right-4 sm:right-6'}`}
       >
-        <span class="grid h-6 w-6 place-items-center rounded-full bg-white text-sm font-black text-emerald-500">☎</span>
-        <span class="hidden text-sm font-bold sm:inline">{isAr() ? 'واتساب' : 'WhatsApp'}</span>
+        <span class="absolute inset-0 rounded-full bg-emerald-400/40 animate-ping"></span>
+        <span class="absolute -inset-2 rounded-full border border-emerald-300/30 opacity-70 animate-pulse"></span>
+        <span class="relative grid h-12 w-12 place-items-center rounded-full bg-white shadow-lg shadow-emerald-950/30 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
+          <img
+            src={`/whatsapp.svg?v=${WHATSAPP_ICON_VERSION}`}
+            alt="WhatsApp"
+            class="h-11 w-11"
+            width="44"
+            height="44"
+            loading="eager"
+            decoding="async"
+          />
+        </span>
+        <span class="relative hidden pe-1 text-sm font-extrabold leading-tight sm:block">
+          <span class="block">{isAr() ? 'تواصل الآن' : 'Chat now'}</span>
+          <span class="block text-xs font-bold text-emerald-50/85">WhatsApp</span>
+        </span>
       </a>
     </>
   );
