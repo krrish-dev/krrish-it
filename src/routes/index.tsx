@@ -5,25 +5,26 @@ import { LocalizedHome } from '../components/localized-home/localized-home';
 export default component$(() => <LocalizedHome locale="it" variant="compact" />);
 
 export const head: DocumentHead = {
-  title: 'Krrish IT Service | Kerols Badr - Sviluppatore Web Full Stack',
+  title: 'Kerols Badr | Sviluppatore Web Full Stack & Server Admin',
   meta: [
     {
       name: 'description',
       content:
-        'Kerols Badr realizza siti web, applicazioni moderne, dashboard e soluzioni server sicure per aziende e professionisti.',
+        'Krrish IT Service offre sviluppo web, dashboard, API, Laravel, Node.js, gestione server Linux, Nginx, SSL e deployment sicuro da remoto.',
     },
     {
       name: 'keywords',
       content:
-        'Kerols Badr, Krrish IT, sviluppatore web, software engineer, full-stack developer, Node.js, PHP Laravel, server Linux, DevOps, siti web professionali',
+        'Kerols Badr, Krrish IT, sviluppatore web full stack, server admin, Node.js, Laravel, Linux, Nginx, DevOps, DigitalOcean, Netlify',
     },
     {
       property: 'og:title',
-      content: 'Krrish IT Service | Kerols Badr',
+      content: 'Kerols Badr | Sviluppatore Web Full Stack & Server Admin',
     },
     {
       property: 'og:description',
-      content: 'Siti web, applicazioni moderne e soluzioni server sicure per aziende e professionisti.',
+      content:
+        'Sviluppo siti web, dashboard, API e deployment sicuri con Laravel, Node.js, Linux, Nginx e DevOps.',
     },
   ],
 };
