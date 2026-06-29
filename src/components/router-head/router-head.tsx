@@ -46,7 +46,7 @@ export const RouterHead = component$(() => {
       <link rel="canonical" href={canonicalUrl} />
       {!isAdminRoute &&
         alternateLocales.map((item) => (
-          <link key={item.hreflang} rel="alternate" hrefLang={item.hreflang} href={item.href} />
+          <link key={item.hreflang} rel="alternate" hreflang={item.hreflang} href={item.href} />
         ))}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta name="format-detection" content="telephone=no" />
