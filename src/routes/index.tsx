@@ -4,7 +4,9 @@ import type { DocumentHead } from '@builder.io/qwik-city';
 type Locale = 'ar' | 'en';
 type ThemeMode = 'dark' | 'light';
 
-const HERO_ASSET_VERSION = 'hero-v20260629-01';
+const HERO_ASSET_VERSION = 'hero-v20260629-02';
+const WHATSAPP_PHONE = '201091435488';
+const WHATSAPP_MESSAGE = 'أنا مستخدم من krrish it وأريد التواصل معكم';
 
 export default component$(() => {
   const locale = useSignal<Locale>('en');
@@ -63,6 +65,7 @@ export default component$(() => {
   const heroImage = () => isAr()
     ? `/hero-ar.webp?v=${HERO_ASSET_VERSION}`
     : `/hero-en.webp?v=${HERO_ASSET_VERSION}`;
+  const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
   const skills = [
     { name: 'Node.js', level: 90 },
@@ -104,12 +107,13 @@ export default component$(() => {
       <section
         id="about"
         data-hero-version={HERO_ASSET_VERSION}
-        class={`relative min-h-[700px] lg:min-h-[780px] overflow-hidden flex items-center ${isAr() ? 'font-arabic' : ''}`}
+        class={`relative min-h-[calc(100vh-88px)] md:min-h-[700px] lg:min-h-[780px] overflow-hidden flex items-end md:items-center ${isAr() ? 'font-arabic' : ''}`}
       >
         <img
           src={heroImage()}
           alt={isAr() ? 'كيرلس بدر - Krrish IT Service' : 'Kerols Badr - Krrish IT Service'}
-          class="absolute inset-0 h-full w-full object-cover select-none pointer-events-none"
+          class="absolute inset-0 h-full w-full object-cover select-none pointer-events-none opacity-95 md:opacity-100"
+          style={{ objectPosition: isAr() ? '72% center' : '28% center' }}
           loading="eager"
           fetchPriority="high"
           decoding="async"
@@ -122,15 +126,20 @@ export default component$(() => {
               : 'linear-gradient(90deg, rgba(15,23,42,0.12) 0%, rgba(15,23,42,0.50) 42%, rgba(15,23,42,0.92) 70%, rgba(15,23,42,0.98) 100%)',
           }}
         />
+        <div class="absolute inset-0 md:hidden bg-gradient-to-t from-[#0f172a] via-[#0f172a]/78 to-[#0f172a]/10 pointer-events-none"></div>
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_76%_35%,rgba(6,182,212,0.12),transparent_28%),radial-gradient(circle_at_88%_78%,rgba(29,78,216,0.12),transparent_26%)] pointer-events-none"></div>
         <div class="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#0f172a] to-transparent pointer-events-none"></div>
 
-        <div class="relative z-10 w-full px-6 lg:px-12 py-24 lg:py-32" dir="ltr">
+        <div class="relative z-10 w-full px-5 sm:px-6 lg:px-12 pt-28 pb-10 md:py-24 lg:py-32" dir="ltr">
           <div class={`max-w-6xl mx-auto w-full flex ${isAr() ? 'justify-start' : 'justify-end'}`}>
-            <div dir={isAr() ? 'rtl' : 'ltr'} class={`w-full max-w-[34rem] ${isAr() ? 'text-right' : 'text-left'}`}>
-              <p class="text-sm font-semibold uppercase tracking-widest mb-4 text-cyan-400">
+            <div
+              dir={isAr() ? 'rtl' : 'ltr'}
+              class={`w-full max-w-[34rem] rounded-[2rem] border border-white/10 bg-slate-950/58 p-5 shadow-2xl shadow-cyan-950/40 backdrop-blur-md md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-0 ${isAr() ? 'text-right' : 'text-left'}`}
+            >
+              <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-cyan-300 md:border-0 md:bg-transparent md:px-0 md:py-0 md:text-sm md:text-cyan-400">
+                <span class="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.9)]"></span>
                 {isAr() ? 'مرحباً، أنا' : "Hi, I'm"}
-              </p>
+              </div>
               <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 leading-tight drop-shadow-xl">
                 {isAr() ? (
                   <>
@@ -159,6 +168,11 @@ export default component$(() => {
                 <a href="#services" class="px-8 py-3.5 rounded-xl font-bold transition-all text-center border border-slate-600 hover:border-cyan-500 hover:bg-slate-800/80 bg-slate-950/20 backdrop-blur-sm">
                   {isAr() ? 'اعرف المزيد' : 'Learn More'}
                 </a>
+              </div>
+              <div class="mt-5 flex flex-wrap gap-2 text-xs font-semibold text-slate-300 md:hidden">
+                <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Node.js</span>
+                <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Laravel</span>
+                <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">DevOps</span>
               </div>
             </div>
           </div>
@@ -252,6 +266,17 @@ export default component$(() => {
           </div>
         </div>
       </section>
+
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={isAr() ? 'تواصل واتساب' : 'Contact on WhatsApp'}
+        class={`fixed bottom-5 z-[80] flex items-center gap-3 rounded-full border border-emerald-300/35 bg-emerald-500 px-4 py-3 text-white shadow-2xl shadow-emerald-900/40 transition-all hover:-translate-y-1 hover:bg-emerald-400 ${isAr() ? 'left-4 sm:left-6' : 'right-4 sm:right-6'}`}
+      >
+        <span class="grid h-6 w-6 place-items-center rounded-full bg-white text-sm font-black text-emerald-500">☎</span>
+        <span class="hidden text-sm font-bold sm:inline">{isAr() ? 'واتساب' : 'WhatsApp'}</span>
+      </a>
     </>
   );
 });
