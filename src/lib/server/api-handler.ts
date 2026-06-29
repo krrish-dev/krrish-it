@@ -1,4 +1,4 @@
-import { MongoClient, ObjectId } from 'mongodb';
+import { MongoClient, ObjectId, type Db } from 'mongodb';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -14,13 +14,21 @@ type RateLimitRecord = {
 };
 
 type JsonBody = Record<string, unknown>;
+type GoogleIndexingNotificationType = 'URL_UPDATED' | 'URL_DELETED';
+type GoogleIndexingAction = 'list' | 'publish' | 'metadata';
 
 const DB_NAME = 'krrish_db';
 const TOKEN_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 30;
+const GOOGLE_INDEXING_SCOPE = 'https://www.googleapis.com/auth/indexing';
+const GOOGLE_TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
+const GOOGLE_INDEXING_PUBLISH_ENDPOINT = 'https://indexing.googleapis.com/v3/urlNotifications:publish';
+const GOOGLE_INDEXING_METADATA_ENDPOINT = 'https://indexing.googleapis.com/v3/urlNotifications/metadata';
 
 let clientPromise: Promise<MongoClient> | null = null;
+let googleIndexingIndexesReady = false;
+let googleAccessTokenCache: { token: string; expiresAt: number } | null = null;
 const rateLimitMap = new Map<string, RateLimitRecord>();
 
 function env(key: string): string {
@@ -158,6 +166,368 @@ function validId(value: unknown): value is string {
   return typeof value === 'string' && ObjectId.isValid(value);
 }
 
+function normalizeGooglePrivateKey(rawValue: string): string {
+  let key = rawValue.trim();
+
+  if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
+    key = key.slice(1, -1);
+  }
+
+  return key.replace(/\\n/g, '\n');
+}
+
+function googleIndexingEnabled(): boolean {
+  return env('GOOGLE_INDEXING_ENABLED').toLowerCase() !== 'false';
+}
+
+function googleIndexingAllowedHosts(): string[] {
+  return (env('GOOGLE_INDEXING_ALLOWED_HOSTS') || 'krrish.it,www.krrish.it')
+    .split(',')
+    .map((host) => host.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function validateIndexingUrl(rawUrl: unknown): string {
+  const value = String(rawUrl || '').trim();
+  if (!value) throw createHttpError('URL is required', 400);
+
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw createHttpError('Invalid URL format', 400);
+  }
+
+  if (!['https:', 'http:'].includes(parsed.protocol)) {
+    throw createHttpError('Only HTTP and HTTPS URLs are allowed', 400);
+  }
+
+  const allowedHosts = googleIndexingAllowedHosts();
+  if (!allowedHosts.includes(parsed.hostname.toLowerCase())) {
+    throw createHttpError(`URL host is not allowed. Allowed hosts: ${allowedHosts.join(', ')}`, 400);
+  }
+
+  parsed.hash = '';
+  return parsed.toString();
+}
+
+function validateIndexingType(rawType: unknown): GoogleIndexingNotificationType {
+  const type = String(rawType || env('GOOGLE_INDEXING_DEFAULT_TYPE') || 'URL_UPDATED').toUpperCase();
+  if (type !== 'URL_UPDATED' && type !== 'URL_DELETED') {
+    throw createHttpError('Invalid notification type. Use URL_UPDATED or URL_DELETED.', 400);
+  }
+  return type;
+}
+
+function getIndexingUrlProperties(url: string, type?: GoogleIndexingNotificationType) {
+  const parsed = new URL(url);
+  return {
+    url,
+    type: type || null,
+    protocol: parsed.protocol.replace(':', ''),
+    host: parsed.hostname,
+    pathname: parsed.pathname,
+    search: parsed.search || '',
+    allowedHost: googleIndexingAllowedHosts().includes(parsed.hostname.toLowerCase()),
+    fragmentRemoved: true,
+    googleIndexed: null,
+    indexingProof: 'notification_only',
+    note:
+      'Google Indexing API confirms notification delivery/metadata only. It does not prove that the URL is indexed in Google Search.',
+  };
+}
+
+function createHttpError(message: string, status = 500, details: unknown = null): Error & { status?: number; details?: unknown } {
+  const error = new Error(message) as Error & { status?: number; details?: unknown };
+  error.status = status;
+  error.details = details;
+  return error;
+}
+
+function extractGoogleNotifyTime(payload: Record<string, any>): string | null {
+  return (
+    payload?.urlNotificationMetadata?.latestUpdate?.notifyTime ||
+    payload?.urlNotificationMetadata?.latestRemove?.notifyTime ||
+    null
+  );
+}
+
+function getGoogleIndexingDailyLimit(): number {
+  const value = Number(env('GOOGLE_INDEXING_DAILY_LIMIT') || 50);
+  return Number.isFinite(value) && value > 0 ? value : 50;
+}
+
+function getGoogleIndexingDuplicateCooldownMinutes(): number {
+  const value = Number(env('GOOGLE_INDEXING_DUPLICATE_COOLDOWN_MINUTES') || 15);
+  return Number.isFinite(value) && value >= 0 ? value : 15;
+}
+
+function startOfToday(): Date {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+}
+
+async function ensureGoogleIndexingIndexes(database: Db): Promise<void> {
+  if (googleIndexingIndexesReady) return;
+
+  await Promise.all([
+    database.collection('google_indexing_logs').createIndex({ createdAt: -1 }),
+    database.collection('google_indexing_logs').createIndex({ url: 1, type: 1, createdAt: -1 }),
+    database.collection('google_indexing_logs').createIndex({ status: 1, createdAt: -1 }),
+  ]);
+
+  googleIndexingIndexesReady = true;
+}
+
+async function getGoogleAccessToken(): Promise<string> {
+  if (googleAccessTokenCache && googleAccessTokenCache.expiresAt > Date.now() + 60_000) {
+    return googleAccessTokenCache.token;
+  }
+
+  if (!googleIndexingEnabled()) {
+    throw createHttpError('Google Indexing integration is disabled', 503);
+  }
+
+  const clientEmail = env('GOOGLE_INDEXING_CLIENT_EMAIL');
+  const privateKey = normalizeGooglePrivateKey(env('GOOGLE_INDEXING_PRIVATE_KEY'));
+
+  if (!clientEmail || !privateKey) {
+    throw createHttpError('Google Indexing credentials are missing from environment variables', 500);
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  const assertion = jwt.sign(
+    {
+      iss: clientEmail,
+      scope: GOOGLE_INDEXING_SCOPE,
+      aud: GOOGLE_TOKEN_ENDPOINT,
+      iat: now,
+      exp: now + 3600,
+    },
+    privateKey,
+    { algorithm: 'RS256' },
+  );
+
+  const response = await fetch(GOOGLE_TOKEN_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion,
+    }),
+  });
+
+  const data = (await response.json().catch(() => ({}))) as Record<string, any>;
+
+  if (!response.ok || !data.access_token) {
+    throw createHttpError(data.error_description || data.error || 'Google OAuth token request failed', response.status || 502, data);
+  }
+
+  const expiresIn = Number(data.expires_in || 3600);
+  googleAccessTokenCache = {
+    token: String(data.access_token),
+    expiresAt: Date.now() + Math.max(expiresIn - 60, 60) * 1000,
+  };
+
+  return googleAccessTokenCache.token;
+}
+
+async function publishGoogleIndexingNotification(url: string, type: GoogleIndexingNotificationType): Promise<Record<string, any>> {
+  const accessToken = await getGoogleAccessToken();
+  const response = await fetch(GOOGLE_INDEXING_PUBLISH_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ url, type }),
+  });
+
+  const data = (await response.json().catch(() => ({}))) as Record<string, any>;
+
+  if (!response.ok) {
+    throw createHttpError(data?.error?.message || 'Google Indexing publish request failed', response.status || 502, data);
+  }
+
+  return data;
+}
+
+async function getGoogleIndexingMetadata(url: string): Promise<Record<string, any>> {
+  const accessToken = await getGoogleAccessToken();
+  const endpoint = `${GOOGLE_INDEXING_METADATA_ENDPOINT}?url=${encodeURIComponent(url)}`;
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  const data = (await response.json().catch(() => ({}))) as Record<string, any>;
+
+  if (!response.ok) {
+    throw createHttpError(data?.error?.message || 'Google Indexing metadata request failed', response.status || 502, data);
+  }
+
+  return data;
+}
+
+async function googleIndexing(req: Request, action: GoogleIndexingAction): Promise<Response> {
+  const user = auth(req);
+  if (!user) return json(req, 401, { error: 'Unauthorized' });
+
+  const method = req.method.toUpperCase();
+  const database = await db();
+  await ensureGoogleIndexingIndexes(database);
+
+  const logs = database.collection('google_indexing_logs');
+  const dailyLimit = getGoogleIndexingDailyLimit();
+  const sentToday = await logs.countDocuments({ status: 'sent', createdAt: { $gte: startOfToday() } });
+
+  if (action === 'list' && method === 'GET') {
+    const data = await logs.find({}).sort({ createdAt: -1 }).limit(50).toArray();
+    return json(req, 200, {
+      success: true,
+      data,
+      info: {
+        enabled: googleIndexingEnabled(),
+        allowedHosts: googleIndexingAllowedHosts(),
+        dailyLimit,
+        sentToday,
+        remainingToday: Math.max(dailyLimit - sentToday, 0),
+        duplicateCooldownMinutes: getGoogleIndexingDuplicateCooldownMinutes(),
+      },
+    });
+  }
+
+  if (action === 'metadata' && method === 'POST') {
+    const body = await readBody(req);
+    const url = validateIndexingUrl(body.url);
+
+    try {
+      const metadata = await getGoogleIndexingMetadata(url);
+      return json(req, 200, {
+        success: true,
+        data: {
+          url,
+          properties: getIndexingUrlProperties(url),
+          googleMetadata: metadata,
+          googleNotifyTime: extractGoogleNotifyTime(metadata),
+          googleIndexed: null,
+          indexingProof: 'notification_only',
+        },
+      });
+    } catch (error) {
+      const err = error as Error & { status?: number; details?: unknown };
+      return json(req, err.status || 502, {
+        success: false,
+        error: err.message,
+        details: err.details || null,
+        data: {
+          url,
+          properties: getIndexingUrlProperties(url),
+          googleIndexed: null,
+          indexingProof: 'notification_only',
+        },
+      });
+    }
+  }
+
+  if (action === 'publish' && method === 'POST') {
+    const body = await readBody(req);
+    const url = validateIndexingUrl(body.url);
+    const type = validateIndexingType(body.type);
+    const force = Boolean(body.force);
+    const properties = getIndexingUrlProperties(url, type);
+
+    if (sentToday >= dailyLimit && !force) {
+      return json(req, 429, {
+        success: false,
+        error: `Daily Google Indexing limit reached (${dailyLimit})`,
+        data: { url, type, properties, sentToday, dailyLimit },
+      });
+    }
+
+    const cooldownMinutes = getGoogleIndexingDuplicateCooldownMinutes();
+    const duplicateCutoff = new Date(Date.now() - cooldownMinutes * 60 * 1000);
+
+    if (!force && cooldownMinutes > 0) {
+      const duplicate = await logs.findOne({
+        url,
+        type,
+        status: 'sent',
+        createdAt: { $gte: duplicateCutoff },
+      });
+
+      if (duplicate) {
+        const skippedLog = {
+          url,
+          type,
+          status: 'skipped',
+          reason: `Duplicate request inside ${cooldownMinutes} minute cooldown`,
+          createdBy: user.email,
+          createdAt: new Date(),
+          properties,
+        };
+        const insert = await logs.insertOne(skippedLog);
+        return json(req, 200, {
+          success: true,
+          skipped: true,
+          message: skippedLog.reason,
+          data: { ...skippedLog, _id: insert.insertedId, duplicateOf: duplicate._id },
+        });
+      }
+    }
+
+    try {
+      const googleResponse = await publishGoogleIndexingNotification(url, type);
+      const log = {
+        url,
+        type,
+        status: 'sent',
+        googleNotifyTime: extractGoogleNotifyTime(googleResponse),
+        googleResponse,
+        properties,
+        createdBy: user.email,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const insert = await logs.insertOne(log);
+
+      return json(req, 200, {
+        success: true,
+        message: 'Sent to Google successfully',
+        data: {
+          ...log,
+          _id: insert.insertedId,
+          googleIndexed: null,
+          indexingProof: 'notification_only',
+        },
+      });
+    } catch (error) {
+      const err = error as Error & { status?: number; details?: unknown };
+      const log = {
+        url,
+        type,
+        status: 'failed',
+        errorMessage: err.message,
+        googleStatus: err.status || 500,
+        googleResponse: err.details || null,
+        properties,
+        createdBy: user.email,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const insert = await logs.insertOne(log);
+
+      return json(req, err.status || 502, {
+        success: false,
+        error: err.message,
+        data: { ...log, _id: insert.insertedId },
+      });
+    }
+  }
+
+  return json(req, 405, { error: 'Method not allowed' });
+}
+
 async function setup(req: Request): Promise<Response> {
   const database = await db();
   const existingUser = await database.collection('users').findOne({});
@@ -183,6 +553,7 @@ async function setup(req: Request): Promise<Response> {
     database.collection('projects').createIndex({ published: 1, order: 1 }),
     database.collection('blog_posts').createIndex({ published: 1, slug: 1 }),
     database.collection('messages').createIndex({ createdAt: -1 }),
+    database.collection('google_indexing_logs').createIndex({ createdAt: -1 }),
   ]);
 
   return json(req, 201, { success: true, message: 'Admin user created successfully. You can now login.' });
@@ -454,6 +825,9 @@ async function route(req: Request): Promise<Response> {
   if (path === '/api/projects') return projects(req);
   if (path === '/api/blog') return blog(req);
   if (path === '/api/messages') return messages(req);
+  if (path === '/api/google-indexing') return googleIndexing(req, 'list');
+  if (path === '/api/google-indexing/publish') return googleIndexing(req, 'publish');
+  if (path === '/api/google-indexing/metadata') return googleIndexing(req, 'metadata');
 
   return json(req, 404, { error: 'API route not found' });
 }
