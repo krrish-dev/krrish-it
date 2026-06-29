@@ -4,7 +4,7 @@ import type { DocumentHead } from '@builder.io/qwik-city';
 type Locale = 'ar' | 'en';
 type ThemeMode = 'dark' | 'light';
 
-const HERO_ASSET_VERSION = 'hero-v20260629-03';
+const HERO_ASSET_VERSION = 'hero-v20260629-04';
 const WHATSAPP_ICON_VERSION = 'wa-v20260629-01';
 const WHATSAPP_PHONE = '201091435488';
 const WHATSAPP_MESSAGE = 'أنا مستخدم من krrish it وأريد التواصل معكم';
@@ -141,7 +141,7 @@ export default component$(() => {
                 <span class="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.9)]"></span>
                 {isAr() ? 'مرحباً، أنا' : "Hi, I'm"}
               </div>
-              <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 leading-tight drop-shadow-xl">
+              <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 leading-tight text-white drop-shadow-xl">
                 {isAr() ? (
                   <>
                     <span class="text-[#e63946]">كيرلس</span>{' '}
@@ -166,7 +166,7 @@ export default component$(() => {
                 <a href="#contact" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-8 py-3.5 rounded-xl font-bold hover:opacity-90 transition-all text-center shadow-lg shadow-cyan-500/20">
                   {isAr() ? 'تواصل معي' : 'Get in Touch'}
                 </a>
-                <a href="#services" class="px-8 py-3.5 rounded-xl font-bold transition-all text-center border border-slate-600 hover:border-cyan-500 hover:bg-slate-800/80 bg-slate-950/20 backdrop-blur-sm">
+                <a href="#services" class="px-8 py-3.5 rounded-xl font-bold text-white transition-all text-center border border-slate-500/80 hover:border-cyan-500 hover:bg-slate-800/80 bg-slate-950/35 backdrop-blur-sm">
                   {isAr() ? 'اعرف المزيد' : 'Learn More'}
                 </a>
               </div>
