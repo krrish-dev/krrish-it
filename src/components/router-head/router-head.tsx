@@ -6,6 +6,10 @@ const SITE_NAME = "Krrish IT Service";
 const BRAND_ALTERNATES = ["Krrish.it", "Krrish IT", "Krrish"];
 const GITHUB_URL = "https://github.com/krrish-dev";
 const LINKEDIN_URL = "https://www.linkedin.com/in/kerols-badr-tawfik-zaki";
+const FACEBOOK_URL = "https://www.facebook.com/Krrish4Dev/";
+const X_URL = "https://x.com/KerolsBadr";
+const INSTAGRAM_URL = "https://www.instagram.com/krrishwebschool";
+const SAME_AS_URLS = [GITHUB_URL, LINKEDIN_URL, FACEBOOK_URL, X_URL, INSTAGRAM_URL];
 const CONTACT_EMAIL = "kerolsbadr@gmail.com";
 const PHONE_E164 = "+201091435488";
 const OG_IMAGE = `${SITE_URL}/og-image.svg`;
@@ -213,7 +217,7 @@ const buildStructuredData = (locale: Locale, canonicalUrl: string, pageTitle: st
         image: OG_IMAGE,
         email: `mailto:${CONTACT_EMAIL}`,
         telephone: PHONE_E164,
-        sameAs: [GITHUB_URL, LINKEDIN_URL],
+        sameAs: SAME_AS_URLS,
         knowsAbout,
         subjectOf: {
           "@id": `${SITE_URL}/#portfolio`,
@@ -232,7 +236,7 @@ const buildStructuredData = (locale: Locale, canonicalUrl: string, pageTitle: st
         image: OG_IMAGE,
         email: CONTACT_EMAIL,
         telephone: PHONE_E164,
-        sameAs: [GITHUB_URL, LINKEDIN_URL],
+        sameAs: SAME_AS_URLS,
         founder: {
           "@id": `${SITE_URL}/#kerols-badr`,
         },
