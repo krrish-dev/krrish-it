@@ -8,7 +8,6 @@ export default component$(() => {
   const loading = useSignal(false);
 
   const handleLogin = $(async (event?: Event) => {
-    event?.preventDefault();
     error.value = '';
     loading.value = true;
 
