@@ -44,7 +44,15 @@ const languageLinks = [
   { locale: 'ar', href: '/ar/', label: 'العربية', shortLabel: 'عربي' },
 ] as const;
 
-export const onGet: RequestHandler = async ({ cacheControl, headers }) => {
+const getLocaleFromPath = (pathname: string): Locale => {
+  if (pathname.startsWith('/ar')) return 'ar';
+  if (pathname.startsWith('/en')) return 'en';
+  return 'it';
+};
+
+export const onGet: RequestHandler = async ({ cacheControl, headers, url }) => {
+  const locale = getLocaleFromPath(url.pathname);
+
   cacheControl({
     maxAge: 0,
     sMaxAge: 0,
@@ -53,6 +61,8 @@ export const onGet: RequestHandler = async ({ cacheControl, headers }) => {
   headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
   headers.set('Pragma', 'no-cache');
   headers.set('Expires', '0');
+  headers.set('Content-Language', locale);
+  headers.set('Vary', 'Accept-Language');
 };
 
 export default component$(() => {
@@ -61,11 +71,7 @@ export default component$(() => {
   const location = useLocation();
   const isAdmin = location.url.pathname.startsWith('/admin');
 
-  const getLocale = (): Locale => {
-    if (location.url.pathname.startsWith('/ar')) return 'ar';
-    if (location.url.pathname.startsWith('/en')) return 'en';
-    return 'it';
-  };
+  const getLocale = (): Locale => getLocaleFromPath(location.url.pathname);
 
   const getBasePath = (locale: Locale) => {
     if (locale === 'ar') return '/ar/';
@@ -98,15 +104,11 @@ export default component$(() => {
     <div
       class={`min-h-screen transition-colors duration-300 ${theme.value === 'dark' ? 'bg-[#0f172a] text-white' : 'bg-white text-slate-900'}`}
       dir={dir}
-      lang={locale === 'it' ? 'it' : locale}
+      lang={locale}
     >
       <nav class={`flex items-center justify-between px-4 sm:px-6 lg:px-12 py-5 border-b backdrop-blur-md sticky top-0 z-50 transition-colors duration-300 ${theme.value === 'dark' ? 'border-slate-800 bg-[#0f172a]/80' : 'border-slate-200 bg-white/80'}`}>
-        <a href="/" class="flex items-center gap-2" aria-label="Krrish IT Service">
-          <span class="text-2xl font-bold">
-            <span class="text-[#e63946]">K</span>
-            <span class={theme.value === 'dark' ? 'text-white' : 'text-slate-900'}>rrish</span>
-            <span class="text-[#1d4ed8]">.it</span>
-          </span>
+        <a href="/" class="flex items-center gap-2" aria-label="Krrish IT Service home" title="Krrish.it">
+          <span class={`text-2xl font-bold ${theme.value === 'dark' ? 'text-white' : 'text-slate-900'}`}>Krrish.it</span>
         </a>
 
         <div class={`hidden md:flex items-center gap-8 text-sm font-medium ${theme.value === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
