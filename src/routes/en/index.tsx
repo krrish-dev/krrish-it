@@ -5,25 +5,26 @@ import { LocalizedHome } from '../../components/localized-home/localized-home';
 export default component$(() => <LocalizedHome locale="en" variant="full" />);
 
 export const head: DocumentHead = {
-  title: 'Krrish IT Service | Kerols Badr - Software Engineer & Server Admin',
+  title: 'Kerols Badr | Full-Stack Developer & Server Admin',
   meta: [
     {
       name: 'description',
       content:
-        'Kerols Badr is a software engineer and server admin delivering full-stack web development, Node.js, PHP Laravel, MongoDB, MySQL, Linux server administration, DevOps, and secure deployment services.',
+        'Full-stack web developer and server admin building websites, dashboards, APIs, Laravel and Node.js apps, MongoDB/MySQL integrations, and secure production deployments.',
     },
     {
       name: 'keywords',
       content:
-        'Kerols Badr, Krrish IT, Software Engineer, Full-Stack Developer, Node.js, PHP, Laravel, Linux, DevOps, Server Admin, Web Development Egypt',
+        'Kerols Badr, Krrish IT, Full-Stack Developer, Software Engineer, Server Admin, Node.js, Laravel, MongoDB, MySQL, Linux, DevOps, Web Development Egypt',
     },
     {
       property: 'og:title',
-      content: 'Krrish IT Service | Kerols Badr',
+      content: 'Kerols Badr | Full-Stack Developer & Server Admin',
     },
     {
       property: 'og:description',
-      content: 'Software Engineer & Server Admin - Building end-to-end web solutions.',
+      content:
+        'Websites, dashboards, APIs, Laravel/Node.js apps, server management, and secure production deployment services.',
     },
   ],
 };
