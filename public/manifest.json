@@ -1,9 +1,21 @@
 {
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
-  "name": "qwik-project-name",
-  "short_name": "Welcome to Qwik",
-  "start_url": ".",
+  "name": "Krrish IT Service",
+  "short_name": "Krrish.it",
+  "description": "Full-stack web development, server administration, DevOps, and secure production deployment services by Kerols Badr.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#fff",
-  "description": "A Qwik project app."
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
