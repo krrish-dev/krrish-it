@@ -198,30 +198,6 @@ export default component$(() => {
     await loadGoogleIndexing();
   });
 
-  const checkIndexingMetadata = $(async () => {
-    const url = indexingUrl.value.trim();
-    if (!url) {
-      status.value = 'Indexing URL is required';
-      return;
-    }
-
-    indexingBusy.value = true;
-    indexingResult.value = null;
-    status.value = 'Checking Google notification metadata...';
-
-    const res = await fetch('/api/google-indexing/metadata', {
-      method: 'POST',
-      credentials: 'include',
-      headers: getJsonAuthHeaders(),
-      body: JSON.stringify({ url }),
-    });
-
-    const data = await res.json().catch(() => ({}));
-    indexingResult.value = data;
-    status.value = res.ok ? 'Metadata loaded' : data.error || 'Metadata check failed';
-    indexingBusy.value = false;
-  });
-
   if (loading.value) {
     return (
       <div class="min-h-screen bg-[#0f172a] flex items-center justify-center">
@@ -517,7 +493,7 @@ export default component$(() => {
             </div>
 
             <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-sm text-yellow-100 leading-relaxed">
-              هذا التاب يرسل إشعار URL إلى Google ويعرض نجاح أو فشل الإرسال وآخر metadata متاحة. حالة “تمت الفهرسة فعليًا في نتائج Google” لا يمكن تأكيدها من Indexing API نفسه، لذلك ستظهر كـ notification only وليس ضمان ظهور في البحث.
+              هذا التاب يرسل إشعار URL إلى Google ويعرض نجاح أو فشل الإرسال داخل السجل. حالة “تمت الفهرسة فعليًا في نتائج Google” لا يمكن تأكيدها من Indexing API نفسه، لذلك الاعتماد هنا على إرسال الإشعار فقط وليس إثبات الظهور في البحث.
             </div>
 
             <form
@@ -558,23 +534,13 @@ export default component$(() => {
                   />
                   Force send and ignore duplicate cooldown
                 </label>
-                <div class="flex flex-col sm:flex-row gap-2">
-                  <button
-                    type="button"
-                    onClick$={checkIndexingMetadata}
-                    disabled={indexingBusy.value}
-                    class="px-4 py-2.5 rounded-lg font-semibold text-sm border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10 disabled:opacity-50"
-                  >
-                    🔎 Check Metadata
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={indexingBusy.value}
-                    class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50"
-                  >
-                    ⚡ Send to Google
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={indexingBusy.value}
+                  class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50"
+                >
+                  ⚡ Send to Google
+                </button>
               </div>
             </form>
 
