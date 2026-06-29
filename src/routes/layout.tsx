@@ -39,9 +39,9 @@ const navCopy = {
 } as const;
 
 const languageLinks = [
-  { locale: 'it', href: '/', label: 'Italiano' },
-  { locale: 'en', href: '/en/', label: 'English' },
-  { locale: 'ar', href: '/ar/', label: 'العربية' },
+  { locale: 'it', href: '/', label: 'Italiano', shortLabel: 'IT' },
+  { locale: 'en', href: '/en/', label: 'English', shortLabel: 'EN' },
+  { locale: 'ar', href: '/ar/', label: 'العربية', shortLabel: 'عربي' },
 ] as const;
 
 export const onGet: RequestHandler = async ({ cacheControl, headers }) => {
@@ -92,6 +92,7 @@ export default component$(() => {
   const labels = navCopy[locale];
   const basePath = getBasePath(locale);
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
+  const mobileLanguageLinks = languageLinks.filter((item) => item.locale !== locale);
 
   return (
     <div
@@ -99,7 +100,7 @@ export default component$(() => {
       dir={dir}
       lang={locale === 'it' ? 'it' : locale}
     >
-      <nav class={`flex items-center justify-between px-6 lg:px-12 py-5 border-b backdrop-blur-md sticky top-0 z-50 transition-colors duration-300 ${theme.value === 'dark' ? 'border-slate-800 bg-[#0f172a]/80' : 'border-slate-200 bg-white/80'}`}>
+      <nav class={`flex items-center justify-between px-4 sm:px-6 lg:px-12 py-5 border-b backdrop-blur-md sticky top-0 z-50 transition-colors duration-300 ${theme.value === 'dark' ? 'border-slate-800 bg-[#0f172a]/80' : 'border-slate-200 bg-white/80'}`}>
         <a href="/" class="flex items-center gap-2" aria-label="Krrish IT Service">
           <span class="text-2xl font-bold">
             <span class="text-[#e63946]">K</span>
@@ -123,8 +124,8 @@ export default component$(() => {
           </a>
         </div>
 
-        <div class="flex items-center gap-3">
-          <div class="hidden sm:flex items-center gap-1 rounded-xl border border-slate-700/70 p-1">
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="hidden md:flex items-center gap-1 rounded-xl border border-slate-700/70 p-1">
             {languageLinks.map((item) => (
               <a
                 key={item.locale}
@@ -132,6 +133,19 @@ export default component$(() => {
                 class={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${item.locale === locale ? 'bg-cyan-500/15 text-cyan-300' : theme.value === 'dark' ? 'text-slate-300 hover:text-cyan-300' : 'text-slate-700 hover:text-cyan-600'}`}
               >
                 {item.label}
+              </a>
+            ))}
+          </div>
+
+          <div class="flex md:hidden items-center gap-1 rounded-xl border border-slate-700/70 bg-slate-950/20 p-1">
+            {mobileLanguageLinks.map((item) => (
+              <a
+                key={item.locale}
+                href={item.href}
+                class={`px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold leading-none transition-all ${theme.value === 'dark' ? 'text-slate-200 hover:text-cyan-300' : 'text-slate-700 hover:text-cyan-600'}`}
+                aria-label={`Switch language to ${item.label}`}
+              >
+                {item.shortLabel}
               </a>
             ))}
           </div>
