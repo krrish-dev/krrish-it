@@ -1,11 +1,10 @@
 import { component$, useSignal, useVisibleTask$, $ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
-import { HERO_IMAGE_AR, HERO_IMAGE_EN } from '~/lib/hero-images';
 
 type Locale = 'ar' | 'en';
 type ThemeMode = 'dark' | 'light';
 
-const HERO_ASSET_VERSION = 'hero-v20260628-05';
+const HERO_ASSET_VERSION = 'hero-v20260629-01';
 
 export default component$(() => {
   const locale = useSignal<Locale>('en');
@@ -61,7 +60,9 @@ export default component$(() => {
 
   const isDark = () => theme.value === 'dark';
   const isAr = () => locale.value === 'ar';
-  const heroImage = () => (isAr() ? HERO_IMAGE_AR : HERO_IMAGE_EN);
+  const heroImage = () => isAr()
+    ? `/hero-ar.webp?v=${HERO_ASSET_VERSION}`
+    : `/hero-en.webp?v=${HERO_ASSET_VERSION}`;
 
   const skills = [
     { name: 'Node.js', level: 90 },
