@@ -3,13 +3,26 @@ import { useDocumentHead, useLocation } from "@builder.io/qwik-city";
 
 const SITE_URL = "https://krrish.it";
 const SITE_NAME = "Krrish IT Service";
-const DEFAULT_TITLE = "Krrish IT Service | Kerols Badr - Software Engineer & Server Admin";
+const DEFAULT_TITLE = "Krrish IT Service | Kerols Badr - Sviluppatore Web Full Stack";
 const DEFAULT_DESCRIPTION =
-  "Kerols Badr is a software engineer and server admin delivering full-stack web development, Node.js, PHP Laravel, MongoDB, MySQL, Linux server administration, DevOps, and secure deployment services.";
+  "Kerols Badr realizza siti web, applicazioni moderne, dashboard e soluzioni server sicure per aziende e professionisti.";
 const DEFAULT_KEYWORDS =
-  "Krrish IT, Kerols Badr, software engineer, full-stack developer, server admin, Node.js developer, PHP Laravel developer, MongoDB, MySQL, Linux server administration, DevOps, web development Egypt";
+  "Krrish IT, Kerols Badr, sviluppatore web, software engineer, full-stack developer, Node.js, PHP Laravel, server Linux, DevOps";
 const OG_IMAGE = `${SITE_URL}/og-image.svg`;
 const ARABIC_FONT_URL = "https://fonts.googleapis.com/css2?family=Noto+" + "Kufi+Arabic:wght@400;500;600;700;800&display=swap";
+
+const alternateLocales = [
+  { hreflang: "it-IT", href: `${SITE_URL}/` },
+  { hreflang: "en", href: `${SITE_URL}/en/` },
+  { hreflang: "ar", href: `${SITE_URL}/ar/` },
+  { hreflang: "x-default", href: `${SITE_URL}/` },
+];
+
+const getOgLocale = (pathname: string) => {
+  if (pathname.startsWith("/ar")) return "ar_EG";
+  if (pathname.startsWith("/en")) return "en_US";
+  return "it_IT";
+};
 
 /**
  * The RouterHead component is placed inside of the document `<head>` element.
@@ -17,8 +30,9 @@ const ARABIC_FONT_URL = "https://fonts.googleapis.com/css2?family=Noto+" + "Kufi
 export const RouterHead = component$(() => {
   const head = useDocumentHead();
   const loc = useLocation();
-  const canonicalUrl = new URL(`${loc.url.pathname}${loc.url.search}`, SITE_URL).href;
+  const canonicalUrl = new URL(loc.url.pathname, SITE_URL).href;
   const isAdminRoute = loc.url.pathname.startsWith("/admin");
+  const ogLocale = getOgLocale(loc.url.pathname);
 
   const hasMeta = (attribute: "name" | "property", value: string) =>
     head.meta.some((meta) => (meta as Record<string, unknown>)[attribute] === value);
@@ -30,6 +44,10 @@ export const RouterHead = component$(() => {
       <title>{pageTitle}</title>
 
       <link rel="canonical" href={canonicalUrl} />
+      {!isAdminRoute &&
+        alternateLocales.map((item) => (
+          <link key={item.hreflang} rel="alternate" hrefLang={item.hreflang} href={item.href} />
+        ))}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta name="format-detection" content="telephone=no" />
       <meta name="theme-color" content="#0f172a" />
@@ -56,7 +74,9 @@ export const RouterHead = component$(() => {
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:image:alt" content="Krrish IT Service logo" />
-      <meta property="og:locale" content="en_US" />
+      <meta property="og:locale" content={ogLocale} />
+      <meta property="og:locale:alternate" content="it_IT" />
+      <meta property="og:locale:alternate" content="en_US" />
       <meta property="og:locale:alternate" content="ar_EG" />
       <meta property="profile:first_name" content="Kerols" />
       <meta property="profile:last_name" content="Badr" />
@@ -92,7 +112,8 @@ export const RouterHead = component$(() => {
             url: SITE_URL,
             sameAs: ["https://github.com/Krrish-dev"],
           },
-          areaServed: ["Egypt", "Worldwide"],
+          areaServed: ["Italy", "Egypt", "Worldwide"],
+          availableLanguage: ["ar", "en", "it"],
           serviceType: [
             "Full-Stack Web Development",
             "Server Administration",
