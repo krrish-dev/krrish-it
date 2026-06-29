@@ -191,7 +191,7 @@ export const LocalizedHome = component$((props: { locale: Locale; variant?: 'com
     const syncTheme = () => {
       const savedTheme = localStorage.getItem('theme') as ThemeMode | null;
       if (savedTheme && savedTheme !== theme.value) theme.value = savedTheme;
-      document.documentElement.lang = locale === 'it' ? 'it-IT' : locale;
+      document.documentElement.lang = locale;
       document.documentElement.dir = isAr ? 'rtl' : 'ltr';
     };
 
@@ -241,7 +241,7 @@ export const LocalizedHome = component$((props: { locale: Locale; variant?: 'com
         id="about"
         data-hero-version={HERO_ASSET_VERSION}
         class={`relative min-h-[calc(100vh-88px)] md:min-h-[700px] lg:min-h-[780px] overflow-hidden flex items-end md:items-center ${isAr ? 'font-arabic' : ''}`}
-        lang={locale === 'it' ? 'it' : locale}
+        lang={locale}
         dir={isAr ? 'rtl' : 'ltr'}
       >
         <img
@@ -283,8 +283,8 @@ export const LocalizedHome = component$((props: { locale: Locale; variant?: 'com
                   </>
                 ) : (
                   <>
-                    <span class="text-[#e63946]">K</span>erols{' '}
-                    <span class="text-[#1d4ed8]">B</span>adr
+                    <span class="text-[#e63946]">Kerols</span>{' '}
+                    <span class="text-[#1d4ed8]">Badr</span>
                   </>
                 )}
               </h1>
@@ -312,7 +312,7 @@ export const LocalizedHome = component$((props: { locale: Locale; variant?: 'com
         </div>
       </section>
 
-      <section id="services" class={`px-6 lg:px-12 py-20 ${isDark() ? 'bg-slate-900/50' : 'bg-slate-50'} ${isAr ? 'font-arabic' : ''}`} lang={locale === 'it' ? 'it' : locale} dir={isAr ? 'rtl' : 'ltr'}>
+      <section id="services" class={`px-6 lg:px-12 py-20 ${isDark() ? 'bg-slate-900/50' : 'bg-slate-50'} ${isAr ? 'font-arabic' : ''}`} lang={locale} dir={isAr ? 'rtl' : 'ltr'}>
         <div class="max-w-6xl mx-auto">
           <div class="text-center mb-14">
             <h2 class="text-3xl md:text-4xl font-bold mb-3">{content.servicesTitle}</h2>
@@ -330,7 +330,7 @@ export const LocalizedHome = component$((props: { locale: Locale; variant?: 'com
         </div>
       </section>
 
-      <section id="skills" class={`px-6 lg:px-12 py-20 ${isAr ? 'font-arabic' : ''}`} lang={locale === 'it' ? 'it' : locale} dir={isAr ? 'rtl' : 'ltr'}>
+      <section id="skills" class={`px-6 lg:px-12 py-20 ${isAr ? 'font-arabic' : ''}`} lang={locale} dir={isAr ? 'rtl' : 'ltr'}>
         <div class="max-w-6xl mx-auto">
           <div class="text-center mb-14">
             <h2 class="text-3xl md:text-4xl font-bold mb-3">{content.skillsTitle}</h2>
@@ -352,7 +352,7 @@ export const LocalizedHome = component$((props: { locale: Locale; variant?: 'com
         </div>
       </section>
 
-      <section id="contact" class={`px-6 lg:px-12 py-20 ${isDark() ? 'bg-slate-900/50' : 'bg-slate-50'} ${isAr ? 'font-arabic' : ''}`} lang={locale === 'it' ? 'it' : locale} dir={isAr ? 'rtl' : 'ltr'}>
+      <section id="contact" class={`px-6 lg:px-12 py-20 ${isDark() ? 'bg-slate-900/50' : 'bg-slate-50'} ${isAr ? 'font-arabic' : ''}`} lang={locale} dir={isAr ? 'rtl' : 'ltr'}>
         <div class="max-w-3xl mx-auto">
           <div class="text-center mb-14">
             <h2 class="text-3xl md:text-4xl font-bold mb-3">{content.contactTitle}</h2>
@@ -394,7 +394,7 @@ export const LocalizedHome = component$((props: { locale: Locale; variant?: 'com
             </div>
             <div class={`p-4 rounded-xl ${isDark() ? 'bg-slate-800/50' : 'bg-white shadow-sm'}`}>
               <p class="text-sm font-semibold mb-1">GitHub</p>
-              <a href="https://github.com/Krrish-dev" target="_blank" class="text-cyan-500 text-sm hover:underline">@Krrish-dev</a>
+              <a href="https://github.com/krrish-dev" target="_blank" rel="noopener noreferrer" class="text-cyan-500 text-sm hover:underline">@krrish-dev</a>
             </div>
           </div>
         </div>
