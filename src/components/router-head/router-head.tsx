@@ -13,9 +13,9 @@ const SAME_AS_URLS = [GITHUB_URL, LINKEDIN_URL, FACEBOOK_URL, X_URL, INSTAGRAM_U
 const CONTACT_EMAIL = "kerolsbadr@gmail.com";
 const PHONE_E164 = "+201091435488";
 const OG_IMAGE = `${SITE_URL}/og-image.svg`;
-const ARABIC_FONT_URL = "https://fonts.googleapis.com/css2?family=Noto+" + "Kufi+Arabic:wght@400;500;600;700;800&display=swap";
-const HERO_AR_URL = "/hero-ar.webp";
-const HERO_EN_URL = "/hero-en.webp";
+const HERO_ASSET_VERSION = "hero-v20260629-05";
+const HERO_AR_URL = `/hero-ar.webp?v=${HERO_ASSET_VERSION}`;
+const HERO_EN_URL = `/hero-en.webp?v=${HERO_ASSET_VERSION}`;
 
 const seoByLocale = {
   it: {
@@ -387,13 +387,7 @@ export const RouterHead = component$(() => {
       <meta name="twitter:image" content={OG_IMAGE} />
       <meta name="twitter:image:alt" content="Krrish IT Service logo" />
 
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      {/* Load Google Fonts non-render-blocking: preload + async load via script */}
-      <link rel="preload" href={ARABIC_FONT_URL} as="style" />
-      <link rel="stylesheet" href={ARABIC_FONT_URL} media="print" id="arabic-font-css" />
-      <script dangerouslySetInnerHTML={`(function(){var l=document.getElementById('arabic-font-css');if(l){l.media='all';}})()`} />
-      {/* Preload hero image for faster LCP */}
+      {/* Preload the exact hero URL used by the rendered image so mobile LCP can reuse it. */}
       {!isAdminRoute && locale === "ar" && (
         <link rel="preload" as="image" href={HERO_AR_URL} fetchPriority="high" />
       )}

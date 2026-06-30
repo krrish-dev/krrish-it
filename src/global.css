@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "KrrishArabic";
+  src: url("/fonts/noto-kufi-arabic-variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-primary: #06b6d4;
   --color-primary-dark: #0891b2;
@@ -20,7 +28,7 @@
   }
 
   [dir="rtl"], .font-arabic {
-    font-family: Noto\ Kufi\ Arabic, Cairo, 'Segoe UI', sans-serif;
+    font-family: "KrrishArabic", Cairo, Tahoma, 'Segoe UI', sans-serif;
   }
 }
 
