@@ -14,6 +14,8 @@ const CONTACT_EMAIL = "kerolsbadr@gmail.com";
 const PHONE_E164 = "+201091435488";
 const OG_IMAGE = `${SITE_URL}/og-image.svg`;
 const ARABIC_FONT_URL = "https://fonts.googleapis.com/css2?family=Noto+" + "Kufi+Arabic:wght@400;500;600;700;800&display=swap";
+const HERO_AR_URL = "/hero-ar.webp";
+const HERO_EN_URL = "/hero-en.webp";
 
 const seoByLocale = {
   it: {
@@ -387,10 +389,19 @@ export const RouterHead = component$(() => {
 
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link rel="stylesheet" href={ARABIC_FONT_URL} />
+      {/* Load Google Fonts non-render-blocking: preload + async load via script */}
+      <link rel="preload" href={ARABIC_FONT_URL} as="style" />
+      <link rel="stylesheet" href={ARABIC_FONT_URL} media="print" id="arabic-font-css" />
+      <script dangerouslySetInnerHTML={`(function(){var l=document.getElementById('arabic-font-css');if(l){l.media='all';}})()`} />
+      {/* Preload hero image for faster LCP */}
+      {!isAdminRoute && locale === "ar" && (
+        <link rel="preload" as="image" href={HERO_AR_URL} fetchPriority="high" />
+      )}
+      {!isAdminRoute && locale !== "ar" && (
+        <link rel="preload" as="image" href={HERO_EN_URL} fetchPriority="high" />
+      )}
       <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       <link rel="apple-touch-icon" href="/favicon.svg" />
-      <link rel="preload" as="image" href="/og-image.svg" />
 
       {!isAdminRoute && (
         <script
