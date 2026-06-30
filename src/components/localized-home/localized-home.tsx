@@ -187,17 +187,25 @@ export const LocalizedHome = component$((props: { locale: Locale; variant?: 'com
   const isCompact = props.variant === 'compact';
 
   // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(() => {
-    const syncTheme = () => {
+  useVisibleTask$(({ cleanup }) => {
+    document.documentElement.lang = locale;
+    document.documentElement.dir = isAr ? 'rtl' : 'ltr';
+
+    const applySavedTheme = () => {
       const savedTheme = localStorage.getItem('theme') as ThemeMode | null;
-      if (savedTheme && savedTheme !== theme.value) theme.value = savedTheme;
-      document.documentElement.lang = locale;
-      document.documentElement.dir = isAr ? 'rtl' : 'ltr';
+      if ((savedTheme === 'dark' || savedTheme === 'light') && savedTheme !== theme.value) {
+        theme.value = savedTheme;
+      }
     };
 
-    syncTheme();
-    const timer = window.setInterval(syncTheme, 250);
-    return () => window.clearInterval(timer);
+    applySavedTheme();
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === 'theme') applySavedTheme();
+    };
+
+    window.addEventListener('storage', handleStorage);
+    cleanup(() => window.removeEventListener('storage', handleStorage));
   });
 
   const handleContact = $(async (event: SubmitEvent) => {
@@ -251,6 +259,7 @@ export const LocalizedHome = component$((props: { locale: Locale; variant?: 'com
           style={{ objectPosition: isAr ? '72% center' : '28% center' }}
           width="1672"
           height="941"
+          sizes="100vw"
           loading="eager"
           fetchPriority="high"
           decoding="async"
@@ -419,6 +428,7 @@ export const LocalizedHome = component$((props: { locale: Locale; variant?: 'com
             width="44"
             height="44"
             loading="eager"
+            fetchPriority="low"
             decoding="async"
           />
         </span>
