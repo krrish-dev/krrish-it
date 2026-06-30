@@ -69,6 +69,7 @@ export default tseslint.config(
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "qwik/jsx-img": "off",
+      "qwik/no-async-prevent-default": "off",
     },
   },
 );
