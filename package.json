@@ -10,8 +10,12 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare:fonts": "node scripts/prepare-fonts.mjs",
+    "prebuild": "node scripts/prepare-fonts.mjs",
     "build": "qwik build preview",
+    "prebuild.digitalocean": "node scripts/prepare-fonts.mjs",
     "build.digitalocean": "qwik build preview",
+    "prebuild.netlify": "node scripts/prepare-fonts.mjs",
     "build.netlify": "qwik build",
     "build.client": "vite build",
     "build.preview": "vite build --ssr src/entry.preview.tsx",
@@ -23,7 +27,9 @@
     "fmt": "prettier --write .",
     "fmt.check": "prettier --check .",
     "lint": "eslint \"src/**/*.ts*\"",
+    "prepreview": "node scripts/prepare-fonts.mjs",
     "preview": "qwik build preview && vite preview --host 0.0.0.0 --port ${PORT:-3000}",
+    "prestart": "node scripts/prepare-fonts.mjs",
     "start": "vite preview --host 0.0.0.0 --port ${PORT:-3000}",
     "qwik": "qwik"
   },
